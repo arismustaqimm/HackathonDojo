@@ -1,0 +1,45 @@
+/* Appearance applies to every route; default retains the original navy palette. */
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}
+body,button,input,select,textarea,.sk-hero h1,.sk-bottom h2{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif!important}
+.sk-toggle{border:1px solid var(--line);border-radius:10px;min-width:40px;height:40px;background:var(--bg);color:var(--ink);font-weight:700;flex-shrink:0}
+.header-inner{gap:14px}.desktop-nav{gap:16px;margin-left:0}.header-actions{gap:8px}
+.sk-monogram{display:grid;place-items:center;width:48px;height:48px;border-radius:13px;background:#273e60;color:#a9cdff;font-weight:800;flex-shrink:0}
+.sk-dates{margin:18px 0;border-top:1px solid #34415a;padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.sk-dates dt{font-size:12px;color:#a6b5cb}.sk-dates dd{margin:6px 0 0;font-size:13px;line-height:1.5}
+.sk-tabs,.sk-pagination{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.sk-tabs a,.sk-pagination button{border:1px solid #45546c;border-radius:10px;padding:11px 16px;color:inherit;background:transparent}.sk-tabs a[aria-current],.sk-pagination button[aria-current]{background:#6246ea;color:white;border-color:#6246ea}.sk-pagination{justify-content:center;margin-top:30px}
+[data-theme="dark"]{--ink:#edf2fc;--muted:#b1bfd5;--bg:#0d1b2d;--slate:#15253a;--line:#34455e;--soft:#23304b;--purple:#b4a4ff;--deep:#9681f3;color-scheme:dark}
+[data-theme="dark"] body,[data-theme="dark"] .site-header,[data-theme="dark"] .site-footer{background:#0d1b2d;color:var(--ink)}
+[data-theme="dark"] :is(.panel,.server-card,.story-card,.mentor-card,.opportunity-card,.modal,.filter-bar,.auth-modal-bg .modal,.mobile-nav,.stat-card,.chat-main,.chat-sidebar,.channel-list,.dashboard-sidebar,.dash-sidebar){background:#192a40;color:var(--ink);border-color:var(--line)}
+[data-theme="dark"] :is(input,select,textarea,.btn-outline,.icon-btn){background:#1c2a40;color:var(--ink);border-color:var(--line)}
+[data-theme="dark"] :is(.page-hero,.community-section,.section-alt,.chat-shell){background:#132238}
+[data-theme="dark"] :is(.nav-link,.site-header .text-link,.footer-col a,.company-line,.small-note,.muted,.detail-meta){color:#b1bfd5}
+[data-theme="dark"] .btn-primary{background:#795bee;color:#fff}[data-theme="dark"] .btn-ghost{background:#283454;color:#d4caff}
+[data-theme="light"]{color-scheme:light;--sk-ink:#17233e;--sk-muted:#53647c}
+[data-theme="light"] body.sk-theme,[data-theme="light"] body.sk-theme .site-header,[data-theme="light"] body.sk-theme .site-footer,[data-theme="light"] .sk-page{background:#f8f9fd;color:#17233e}
+[data-theme="light"] .sk-home{background:radial-gradient(ellipse at 50% 5%,#e7efff,#f8f9fd 75%)}
+[data-theme="light"] .sk-bottom{background:#edf1fa}
+[data-theme="light"] :is(.sk-hero h1,.sk-page h1,.sk-bottom h2,.sk-org h3),[data-theme="light"] body.sk-theme .site-header :is(.nav-link,.logo,.text-link){color:#17233e}
+[data-theme="light"] :is(.sk-hero p,.sk-sub,.sk-bottom p,.sk-org p,.sk-results,.sk-note,.sk-dates dt,.sk-domain){color:#53647c}
+[data-theme="light"] :is(.sk-card,.sk-tile,.sk-home-search,.sk-search,.sk-controls select){background:white;color:#17233e;border-color:#d4ddeb}
+[data-theme="light"] :is(.sk-home-search input,.sk-search input){color:#17233e}
+[data-theme="light"] .sk-tile :is(strong,p){color:#34405a}
+[data-theme="light"] .sk-alert{background:#eef3fc;color:#405574;border-color:#cfdaeb}
+[data-theme="light"] :is(.sk-quicklinks a,.sk-bottom-links a,.sk-share,.sk-apply){color:#344a69;border-color:#c7d3e5;background:#f1f5fc}
+[data-theme="light"] .sk-pill.green{background:#dff5ed;color:#13694f}[data-theme="light"] .sk-pill.amber{background:#fff0d2;color:#80520d}
+[data-theme="light"] .sk-monogram{background:#edf0ff;color:#533ad9}[data-theme="light"] .sk-dates{border-color:#d4ddeb}
+[data-theme="light"] .sk-results span{color:#80520d}
+@media(max-width:1150px){.desktop-nav{gap:10px}.employer-link{display:none}.header-inner{gap:10px}.header-actions .btn{padding:9px 12px}}
+@media(max-width:950px){.desktop-nav{display:none}.mobile-menu-btn{display:grid}.site-header{height:auto;min-height:77px}.header-inner{min-height:77px}.mobile-nav{display:flex;flex-wrap:wrap;gap:14px;padding:15px 24px}.header-actions .btn-primary{display:none}}
+@media(max-width:480px){.logo{font-size:20px;gap:5px}.logo-mark{width:26px;height:26px}.header-inner{width:calc(100% - 20px);gap:7px}.sk-toggle{min-width:34px;height:36px}.header-actions{gap:5px}.header-actions .btn-outline{padding:9px}.sk-dates{grid-template-columns:1fr}.sk-card-actions{flex-wrap:wrap}.sk-pagination button{padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+[data-theme="dark"] :is(.test-card,.empty,.server-layout,.server-channels,.role-choice,.q-choice,.q-num,.tab,.timer,.mini-server,.fake-discord,.quick-item,.float-card,.hero-board,.search-large){background:#192a40;color:#edf2fc;border-color:#34455e}
+[data-theme="dark"] :is(.alert,.alert.info){background:#1a304b;color:#d1def1;border-color:#3e5878}
+[data-theme="dark"] :is(.chip,.q-letter,.modal-x,.save-btn,.test-icon,.feature-icon,.step-n){background:#283454;color:#d4caff;border-color:#455778}
+[data-theme="dark"] :is(.test-card p,.mentor-card p,.server-card p,.story-card p,.panel p,.subtle,.dash-link,.footer-col h4){color:#b1bfd5}
+[data-theme="dark"] :is(.q-choice.selected,.role-choice.active,.tab.active,.q-num.current){background:#3b2e67;color:#f0eaff}
+@media(max-width:1250px){.desktop-nav{display:none}.mobile-menu-btn{display:grid}.mobile-nav{display:flex;flex-wrap:wrap;gap:14px;padding:15px 24px}.site-header{height:auto;min-height:77px}.header-inner{min-height:77px}}
+[data-theme="light"] body.sk-theme .site-footer{color:#53647c}
+[data-theme="light"] body.sk-theme .site-footer :is(a,.logo){color:#34405a}
+[data-theme="light"] .sk-kicker{color:#087c6b}
+[data-theme="light"] .sk-save{color:#53647c}
+[data-theme="light"] .footer-bottom{color:#53647c;border-color:#d4ddeb}
+.employer-link{white-space:nowrap;font-size:12px}
