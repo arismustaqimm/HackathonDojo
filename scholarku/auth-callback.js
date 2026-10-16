@@ -11,10 +11,11 @@
     status.textContent = malay ? 'Berjaya log masuk. Anda boleh menutup tetingkap ini.' : 'You are signed in. You can close this window.';
     if (window.opener && !window.opener.closed) { window.opener.postMessage({type: 'scholarku:google-complete'}, location.origin); window.close(); }
     else location.replace('/#/dashboard');
-  }).catch(() => {
+  }).catch(error => {
     history.replaceState(null, '', location.pathname);
-    status.textContent = malay ? 'Log masuk tidak dapat diselesaikan. Sila cuba lagi.' : 'Sign-in could not be completed. Please try again.';
+    const detail = String(error.message || 'Google sign-in failed').slice(0, 300);
+    status.textContent = (malay ? 'Log masuk tidak dapat diselesaikan: ' : 'Sign-in could not be completed: ') + detail;
     document.getElementById('oauth-return').hidden = false;
-    if (window.opener && !window.opener.closed) window.opener.postMessage({type: 'scholarku:google-error'}, location.origin);
+    if (window.opener && !window.opener.closed) window.opener.postMessage({type: 'scholarku:google-error', message: detail}, location.origin);
   });
 })();

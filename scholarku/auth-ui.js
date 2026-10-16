@@ -56,7 +56,10 @@
     if (!window.API.enabled) return unavailable();
     setBusy(true);
     try { await window.API.signInWithGoogle(); await finish(); }
-    catch { message(tr('Google sign-in did not finish. Allow the sign-in popup and try again.','Log masuk Google tidak selesai. Benarkan tetingkap log masuk dan cuba lagi.')); }
+    catch (error) {
+      const detail = String(error.message || '').slice(0, 300);
+      message(tr('Google sign-in did not finish. ','Log masuk Google tidak selesai. ') + (window.ScholarkuI18n.text(detail) || tr('Please try again.','Sila cuba lagi.')));
+    }
     finally { setBusy(false); }
   });
   window.ScholarkuAuth = {render};

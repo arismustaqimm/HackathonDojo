@@ -50,7 +50,9 @@
     if (!raw) throw new Error('Sign-in request expired');
     localStorage.removeItem(oauthKey(state));
     const pending = JSON.parse(raw);
-    if (Date.now() - pending.created > 5 * 60 * 1000 || !url.searchParams.get('code') || url.searchParams.has('error')) throw new Error('Sign-in was not completed');
+    if (Date.now() - pending.created > 5 * 60 * 1000) throw new Error('Sign-in request expired. Please try again.');
+    if (url.searchParams.has('error')) throw new Error((url.searchParams.get('error_description') || url.searchParams.get('error')).slice(0, 300));
+    if (!url.searchParams.get('code')) throw new Error('Google did not return an authorization code. Check the Supabase redirect URL settings.');
     const data = await request('/auth/v1/token?grant_type=pkce', {
       method: 'POST', body: JSON.stringify({auth_code: url.searchParams.get('code'), code_verifier: pending.verifier})
     }, false);
@@ -71,14 +73,15 @@
         clearInterval(poll); clearTimeout(timeout);
         window.removeEventListener('message', receive);
         localStorage.removeItem(oauthKey(state));
-        if (!popup.closed) popup.close();
+        // Leave failures visible instead of hiding the reason in a closed window.
+        if (!error && !popup.closed) popup.close();
         if (error) reject(error); else resolve(reloadSession());
       }
       function receive(event) {
         if (event.origin !== location.origin || event.source !== popup) return;
         if (event.data?.type === 'scholarku:google-complete') {
           if (reloadSession()?.access_token) cleanup(); else cleanup(new Error('No authenticated session received'));
-        } else if (event.data?.type === 'scholarku:google-error') cleanup(new Error('Google sign-in failed'));
+        } else if (event.data?.type === 'scholarku:google-error') cleanup(new Error(String(event.data.message || 'Google sign-in failed').slice(0, 300)));
       }
       window.addEventListener('message', receive);
       const poll = setInterval(() => { if (popup.closed) cleanup(new Error('Sign-in window closed')); }, 500);

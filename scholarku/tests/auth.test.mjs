@@ -24,3 +24,8 @@ test('wrong origins, expired attempts, unknown state and provider errors cannot 
   ['http://localhost:5173/auth-callback.html?state=nonce&error=access_denied',Date.now()]
  ]){const {api,values,requests}=adapter();values.set('scholarku.oauth.nonce',JSON.stringify({created,verifier:'test-verifier'}));await assert.rejects(api.completeGoogleSignIn(new URL(url)));assert.equal(requests.length,0);assert(!values.has('scholarku.auth'))}
 });
+test('provider error description is preserved for diagnosis without a token exchange',async()=>{
+ const {api,values,requests}=adapter();values.set('scholarku.oauth.nonce',JSON.stringify({created:Date.now(),verifier:'test-verifier'}));
+ await assert.rejects(api.completeGoogleSignIn(new URL('http://localhost:5173/auth-callback.html?state=nonce&error=access_denied&error_description=Google+provider+is+not+enabled')),/Google provider is not enabled/);
+ assert.equal(requests.length,0);assert(!values.has('scholarku.auth'));
+});
