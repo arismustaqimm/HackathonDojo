@@ -1,137 +1,1038 @@
-/* SCHOLARKU — student opportunities hub. Offline demo + optional Supabase-backed internship workflows.
-   All example records are fictional and intentionally marked as demo data. */
+/* SCHOLARKU — student opportunity directories and Supabase-backed student workflows.
+   Community and mentoring features are implemented in their dedicated modules. */
 (() => {
-'use strict';
-const $ = s => document.querySelector(s);
-const icons = {
- search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>',chev:'<path d="m9 18 6-6-6-6"/>',
- spark:'<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/>',
- cap:'<path d="m2 10 10-5 10 5-10 5-10-5Zm4 2.5V18c4 2.7 8 2.7 12 0v-5.5M22 10v7"/>',brief:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>',
- trophy:'<path d="M8 21h8m-4-4v4M7 3h10v8a5 5 0 0 1-10 0V3ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2H3Zm14-14a3 3 0 0 1 0 6m1 3a5 5 0 0 1 3 5"/>',
- code:'<path d="m8 8-4 4 4 4m8-8 4 4-4 4m-3-14-3 20"/>',mentor:'<rect x="2" y="4" width="20" height="15" rx="2"/><path d="M8 22h8m-4-3v3m-5-11 3 3 6-6"/>',
- bookmark:'<path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v18l-7-5-7 5V4Z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',pin:'<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
- shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',check:'<path d="m4 12 5 5L20 6"/>',close:'<path d="M5 5 19 19M19 5 5 19"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
- calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/>',message:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 10 10 0 0 1-4-.9L3 21l1.9-5.5A9 9 0 0 1 3 11.5 9 9 0 0 1 12 3a9 9 0 0 1 9 8.5Z"/>',
- book:'<path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v16H5a2 2 0 0 1-2-2V5Zm0 13a3 3 0 0 1 3-3h15"/>',bolt:'<path d="m13 2-10 12h8l-1 8 11-12h-8l0-8Z"/>',
- user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2H4Z"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 10h18c0-2-3-3-3-10Zm-8 13h4"/>',
- clipboard:'<rect x="5" y="5" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="5" rx="1"/><path d="M8 12h8m-8 4h8"/>',
- filter:'<path d="M4 5h16L14 12v6l-4 2v-8L4 5Z"/>',send:'<path d="m22 2-7 20-4-9-9-4 20-7ZM11 13l11-11"/>',
- star:'<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z"/>',external:'<path d="M14 4h6v6m0-6-9 9M20 14v6H4V4h6"/>',
- file:'<path d="M6 2h9l5 5v15H6V2Zm9 0v5h5M9 12h8m-8 4h8"/>',building:'<rect x="4" y="3" width="16" height="19" rx="1"/><path d="M9 22v-5h6v5M8 7h2m4 0h2M8 12h2m4 0h2"/>',
- logout:'<path d="M10 4H4v16h6m5-12 4 4-4 4m-11-4h15"/>',plus:'<path d="M12 5v14M5 12h14"/>',play:'<path d="m8 5 11 7-11 7V5Z"/>',
- refresh:'<path d="M20 7v5h-5M4 17v-5h5m10-2a7 7 0 0 0-12-4L4 12m16 0-3 6a7 7 0 0 1-12-4"/>',gift:'<rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 9v13M3 13h18M12 9C2 9 5 1 9 4c2 1 3 5 3 5Zm0 0c10 0 7-8 3-5-2 1-3 5-3 5Z"/>',
- video:'<rect x="2" y="5" width="14" height="14" rx="2"/><path d="m16 9 6-4v14l-6-4"/>',lock:'<rect x="4" y="10" width="16" height="12" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/>'
-};
-const ic = (name, size=18) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.spark}</svg>`;
-const h = x => String(x ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const attr = h;
-const initials = n => (n||'SK').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase();
-const demo = [
- {id:'o1',type:'Internship',title:'Software Engineering Intern',org:'Nusantara Digital Labs',brand:'ND',color:'#ede8ff',ink:'#6e4cc6',industry:'Technology',location:'Kuala Lumpur',mode:'Hybrid',field:'Computer Science',level:'Undergraduate',allowance:'Not specified',category:'MNC',duration:'3–6 months',status:'Demo',details:'Collaborate with a small product team to build web applications, test new features, and learn practical software engineering workflows. Fictional vacancy for demonstration only.',skills:['JavaScript','React','Git'],external_url:''},
- {id:'o2',type:'Scholarship',title:'Future Innovators Scholarship',org:'Cendekia Education Fund',brand:'CE',color:'#e7f7f3',ink:'#189983',industry:'Education',location:'Malaysia-wide',mode:'Nationwide',field:'All Fields',level:'Undergraduate',category:'Foundation',status:'Demo',details:'Sample scholarship illustrating a need-and-merit based financial aid listing. Not a real scholarship; verify actual opportunities with official providers.',skills:['Academic achievement','Leadership']},
- {id:'o3',type:'Competition',title:'Build for Good Hackathon',org:'Campus Builders Collective',brand:'CB',color:'#fff1e4',ink:'#df9254',industry:'Technology',location:'Selangor',mode:'On-site',field:'Computer Science',level:'All Levels',category:'Community',status:'Demo',details:'A sample weekend team hackathon where participants prototype meaningful solutions to local problems. For demonstration only.',skills:['Teamwork','Pitching','Prototyping']},
- {id:'o4',type:'Internship',title:'Data Analytics Intern',org:'Meridian Insights Studio',brand:'MI',color:'#e8f2ff',ink:'#5b8dc9',industry:'Data & AI',location:'Penang',mode:'Remote',field:'Data Science',level:'Undergraduate',allowance:'Not specified',category:'SME',duration:'3 months',status:'Demo',details:'Work with sample data sets and dashboards to learn how analysts turn business questions into useful insights. Fictional demo employer.',skills:['SQL','Python','Power BI']},
- {id:'o5',type:'Workshop',title:'AI Agents: From Idea to Prototype',org:'Tech Youth Network',brand:'TY',color:'#efe7ff',ink:'#8c60c6',industry:'Technology',location:'Online',mode:'Online',field:'Computer Science',level:'All Levels',category:'Community',status:'Demo',details:'Practice planning an AI assistant workflow and creating a basic agent prototype. Sample workshop, not an announced public event.',skills:['AI','Prompting','Automation']},
- {id:'o6',type:'Internship',title:'Cybersecurity Analyst Intern',org:'Bintang Secure Systems',brand:'BS',color:'#e9f8ee',ink:'#41976e',industry:'Cybersecurity',location:'Johor',mode:'On-site',field:'Cybersecurity',level:'Undergraduate',allowance:'Not specified',category:'SME',duration:'6 months',status:'Demo',details:'Sample internship assisting with defensive monitoring, security documentation and security awareness activities.',skills:['Linux','Networking','Security']},
- {id:'o7',type:'Scholarship',title:'Emerging Leaders Bursary',org:'Harapan Scholars Foundation',brand:'HS',color:'#fff1e9',ink:'#cf8162',industry:'Education',location:'Malaysia-wide',mode:'Nationwide',field:'Business',level:'Diploma & Degree',category:'Foundation',status:'Demo',details:'A fictional example of financial assistance for Malaysian students with leadership potential.',skills:['Leadership','Community work']},
- {id:'o8',type:'Competition',title:'Campus Data Challenge',org:'Open Data Society',brand:'OD',color:'#eaf5ff',ink:'#3784ba',industry:'Data & AI',location:'Online',mode:'Online',field:'Data Science',level:'All Levels',category:'Community',status:'Demo',details:'A fictional data visualization and insight challenge for teams.',skills:['Analytics','Visualization']},
- {id:'o9',type:'Internship',title:'UI/UX Product Design Intern',org:'Pixel Harbour Design',brand:'PH',color:'#ffeff4',ink:'#cd6a91',industry:'Design',location:'Selangor',mode:'Hybrid',field:'Design',level:'Undergraduate',allowance:'Not specified',category:'Startup',duration:'4 months',status:'Demo',details:'Contribute user flows, wireframes and prototypes to an imaginary product design studio.',skills:['Figma','User Research']},
- {id:'o10',type:'Internship',title:'Finance & Quant Research Intern',org:'Crest Quant Research',brand:'CQ',color:'#edf0ff',ink:'#6271bb',industry:'Finance',location:'Kuala Lumpur',mode:'On-site',field:'Finance',level:'Undergraduate',allowance:'Not specified',category:'Firm',duration:'3 months',status:'Demo',details:'A sample internship for students interested in modelling, data analysis and financial research.',skills:['Excel','Python','Statistics']},
- {id:'o11',contract:'No contract',type:'Graduate Programme',title:'Digital Graduate Associate',org:'Jelajah Graduate Academy',brand:'JG',color:'#e1faf6',ink:'#2a9b89',industry:'Technology',location:'Sabah',mode:'Hybrid',field:'Computer Science',level:'Fresh Graduate',allowance:'Not specified',category:'GLC',duration:'12 months · sample',status:'Demo',details:'Illustrative graduate programme with rotational assignments. No real recruitment or contractual terms are asserted.',skills:['Communication','Technology']},
- {id:'o12',type:'Internship',title:'Marketing & Growth Intern',org:'Cahaya Commerce',brand:'CC',color:'#fff2e9',ink:'#cb8054',industry:'Business',location:'Sarawak',mode:'Remote',field:'Business',level:'Undergraduate',allowance:'Not specified',category:'SME',duration:'3 months',status:'Demo',details:'A fictional remote internship supporting campaign performance, content and growth experiments.',skills:['Content','Analytics']},
- {id:'o13',type:'Workshop',title:'Capture the Flag Bootcamp',org:'Community Cyber Lab',brand:'CL',color:'#ecf3fd',ink:'#537ec2',industry:'Cybersecurity',location:'Perak',mode:'Hybrid',field:'Cybersecurity',level:'All Levels',category:'Community',status:'Demo',details:'A fictional beginner workshop on Linux, forensics and puzzle-based cyber security.',skills:['Linux','CTF']},
- {id:'o14',contract:'With contract',type:'Graduate Programme',title:'Future Finance Trainee',org:'Orkid Finance Institute',brand:'OF',color:'#fff0ed',ink:'#d37764',industry:'Finance',location:'Kuala Lumpur',mode:'Hybrid',field:'Finance',level:'Fresh Graduate',allowance:'Not specified',category:'MNC',duration:'18 months · sample',status:'Demo',details:'Illustrative graduate rotational programme. Contract status and intake details are not real.',skills:['Finance','Excel']},
- {id:'o15',type:'Internship',title:'Network Engineering Intern',org:'Awan Infrastruktur',brand:'AI',color:'#e9f1ff',ink:'#5989cc',industry:'Telecommunications',location:'Terengganu',mode:'On-site',field:'IT & Networking',level:'Diploma & Degree',allowance:'Not specified',category:'GLC',duration:'3 months',status:'Demo',details:'A sample infrastructure internship covering monitoring, basic configuration and troubleshooting.',skills:['Networking','TCP/IP']},
-];
-const communities=[
- {id:'tech',name:'Code & Coffee MY',desc:'Developers, hackathons, open source and student tech projects.',members:'1.2k demo members',emoji:'💻',bg:'',channels:['general','hackathons','projects','skill-exchange','announcements']},
- {id:'scholars',name:'Scholarship Seekers',desc:'Applications, interview prep, funding tips and peer support.',members:'860 demo members',emoji:'🎓',bg:'tealbg',channels:['general','scholarships','interviews','announcements']},
- {id:'cyber',name:'Cybersecurity Hub',desc:'CTFs, ethical hacking, Linux labs, and beginner-friendly learning.',members:'740 demo members',emoji:'🛡️',bg:'orangebg',channels:['general','ctf-challenges','resources','announcements']},
- {id:'design',name:'Creators & Designers',desc:'Figma critiques, portfolios, UI/UX and creative challenges.',members:'510 demo members',emoji:'🎨',bg:'',channels:['general','portfolio-feedback','opportunities','announcements']},
- {id:'finance',name:'Finance & Quant Circle',desc:'Finance careers, interview prep, markets and analytics.',members:'330 demo members',emoji:'📊',bg:'tealbg',channels:['general','quant-research','internships','announcements']},
- {id:'ai',name:'AI Builders Malaysia',desc:'AI agents, datathons, models, demos and meetup planning.',members:'680 demo members',emoji:'🤖',bg:'orangebg',channels:['general','ai-agents','datathons','announcements']}
-];
-const mentors=[
- {id:'m1',name:'Alya Rahman',role:'Software Engineer · Industry mentor (demo)',expertise:'Software Engineering',initial:'AR',color:'#f4e8ff',ink:'#9856c7',desc:'Portfolio review, software engineering pathways, and internship preparation.'},
- {id:'m2',name:'Daniel Lim',role:'Data Analyst · Industry mentor (demo)',expertise:'Data & Analytics',initial:'DL',color:'#e3f5f1',ink:'#238f7d',desc:'Python, SQL, project storytelling, and technical interview practice.'},
- {id:'m3',name:'Sofia Ismail',role:'Talent & Recruitment · Mentor (demo)',expertise:'CV & Career',initial:'SI',color:'#fff0df',ink:'#c6853f',desc:'Resume reviews, behavioural interviews, and career direction.'},
- {id:'m4',name:'Amir Hakim',role:'Security Consultant · Mentor (demo)',expertise:'Cybersecurity',initial:'AH',color:'#e9f1ff',ink:'#5a86ba',desc:'CTF learning paths, SOC roles, and hands-on security skill development.'},
- {id:'m5',name:'Maya Tan',role:'UX Researcher · Mentor (demo)',expertise:'Design',initial:'MT',color:'#ffeaf1',ink:'#d16c93',desc:'Design portfolios, case studies and user research foundations.'},
- {id:'m6',name:'Farid Zain',role:'Finance Analyst · Mentor (demo)',expertise:'Finance',initial:'FZ',color:'#eeecff',ink:'#7768c4',desc:'Financial modelling, case preparation and early career choices.'}
-];
-const defaults={ saved:[],applications:[],messages:{},posts:[{id:'p1',name:'Nadia',initial:'NA',title:'Just finished my first CTF!',content:'I joined a beginner capture-the-flag workshop and finally solved my first forensics challenge. If you are curious, try one!',type:'Achievement'},{id:'p2',name:'Hafiz',initial:'HA',title:'Hackathon team assembled 🚀',content:'We built a prototype for a university challenge. Next goal: an AI agent workshop and a datathon!',type:'Project'}],meetings:[],profile:{name:'Demo Student',institution:'International Islamic University Malaysia',field:'Computer Science',state:'Selangor',skills:'JavaScript, SQL, Python'},org:{name:'Demo Campus Innovations',industry:'Technology',location:'Selangor',website:'',registration:''},verification:'Not submitted',roles:'guest',isDemo:true, opportunityAdds:[] };
-let store;try{store={...defaults,...JSON.parse(localStorage.getItem('scholarku.demo')||'{}')}}catch{store={...defaults}};
-const persist=()=>localStorage.setItem('scholarku.demo',JSON.stringify(store));
-let state={ route:parseRoute(),search:'',type:'All',field:'All Fields',location:'All Locations',mode:'Any Mode',industry:'All Industries',companyType:'All Types',contract:'Any Contract',level:'All Levels',channel:'general',role:'student',modal:'',authMode:'signup',mobile:false,liveProfile:null,liveOpps:[],liveApplications:[],liveSaved:[],liveOrgs:[],liveVerification:[],loading:false };
-function parseRoute(){return decodeURI((location.hash||'#/').slice(1)).split('?')[0]||'/'}
-const route=(p)=>{location.hash='#'+p;state.route=p;state.mobile=false;window.scrollTo(0,0);render()};
-const allOp=()=>API.enabled?[...state.liveOpps.map(o=>normalise(o)),...demo,...store.opportunityAdds]:[...demo,...store.opportunityAdds];
-function normalise(o){const org = state.liveOrgs.find(x=>x.id===o.organization_id);return {id:o.id,type:o.kind||'Internship',title:o.title,org:org?.name||'Organization',brand:initials(org?.name),color:'#edeaff',ink:'#6246ea',industry:org?.industry||'Technology',location:o.location_state||'Malaysia',mode:o.work_mode||'On-site',field:o.field||'All Fields',level:o.education_level||'Undergraduate',allowance:o.allowance||'Not specified',category:org?.category||'Company',contract:o.contract_type||'Not specified',duration:o.duration||'Not specified',status:o.is_demo?'Demo':o.status||'Published',details:o.description||'',skills:o.skills||[],verified:org?.verification_status==='approved'&&!o.is_demo,organization_id:o.organization_id,external_url:o.external_url||''};}
-function currentRole(){return API.enabled ? (state.liveProfile?.role||'guest') : store.roles;}
-function isLoggedIn(){return API.enabled?Boolean(API.session):store.roles!=='guest'}
-function isSaved(id){return API.enabled&&!String(id).startsWith('o')?state.liveSaved.some(s=>s.opportunity_id===id):store.saved.includes(id)}
-const toast=(txt)=>{const el=$('#toast');el.textContent=txt;el.hidden=false;clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.hidden=true,3800)};
-function btn(action,label,kind='primary',extra=''){return `<button class="btn btn-${kind}" data-act="${action}" ${extra}>${label}</button>`}
-function header(){return window.ScholarkuNavigation.render(state.route,isLoggedIn())}
-function footer(){return `<footer class="site-footer"><div class="container"><div class="footer-main"><div><a class="logo" href="#/"><span class="logo-mark">${ic('check',23)}</span>scholar<span class="dot">ku.</span></a><p>One place to discover opportunities, build skills, meet peers, and take your next big step. Built for students in Malaysia.</p><span class="badge orange">Hackathon demonstration</span></div><div class="footer-col"><h4>Discover</h4><a href="#/scholarships">Scholarships</a><a href="#/internships">Internships</a><a href="#/explore">Events & competitions</a><a href="#/graduates">Graduate programmes</a></div><div class="footer-col"><h4>Connect</h4><a href="#/community">Student communities</a><a href="#/mentors">Find a mentor</a><a href="#/dashboard">My dashboard</a><a href="#/employers">For employers</a></div><div class="footer-col"><h4>Our promise</h4><a href="#/trust">Employer verification</a><a href="#/trust">Demo data policy</a><a href="#/trust">Privacy & safety</a></div></div><div class="footer-bottom"><span>© 2026 Scholarku. Hackathon prototype — not affiliated with MyScholar, Unstop or the fictional demo organizations.</span><span>Made for Malaysian students 🇲🇾</span></div></div></footer>`}
-function quickNav(){const items=[['cap','Scholarships','Find funding','/scholarships'],['brief','Internships','Build experience','/internships'],['trophy','Competitions','Join challenges','/explore'],['users','Community','Find your people','/community'],['mentor','Mentorship','Grow with guidance','/mentors']];return `<section class="quicknav"><div class="container"><div class="quicknav-grid">${items.map(([i,title,sub,link])=>`<button class="quick-item" data-nav="${link}"><div class="quick-icon">${ic(i,26)}</div><strong>${title}</strong><small>${sub}</small></button>`).join('')}</div></div></section>`}
-function hero(){return `<section class="hero"><div class="container hero-inner"><div class="hero-copy"><span class="eyebrow-line">${ic('spark',15)} Your future, all in one place</span><h1>Big dreams.<br>Real <em>opportunities.</em><br>All in one place.</h1><p>From your first scholarship to your dream internship. Discover opportunities, connect with students and mentors, and turn potential into progress.</p><form class="search-large" id="hero-search">${ic('search',20)}<input name="query" aria-label="Search opportunities" placeholder="Search scholarships, internships, events..." /><button class="btn btn-primary" type="submit">Explore ${ic('arrow',16)}</button></form><div class="trending"><strong>Trending:</strong>${['Hackathons','Scholarships','AI Workshops','Internships'].map(x=>`<button class="trend-chip" data-search="${x}">${x}</button>`).join('')}</div><div class="hero-trust"><div class="mini-avatar-stack"><span class="mini-avatar">AM</span><span class="mini-avatar">SL</span><span class="mini-avatar">NF</span><span class="mini-avatar">DH</span></div><div><strong>Built around the student journey</strong><small>Explore · Prepare · Connect · Grow</small></div></div></div><div class="hero-visual"><div class="orbit"></div><div class="orbit two"></div><div class="hero-board"><div class="hero-board-top"><span class="board-dot"></span><span class="board-dot"></span><span class="board-dot"></span><span class="board-title">my scholarku dashboard</span></div><div class="board-body"><span class="board-small">YOUR OPPORTUNITY HUB ✨</span><div class="board-headline">Ready for what's <span>next?</span></div><div class="board-metric-row"><div class="board-metric">${ic('brief',17)}<strong>6</strong><small>Opportunity categories</small></div><div class="board-metric">${ic('users',17)}<strong>1</strong><small>Connected journey</small></div></div><div class="board-small" style="margin-bottom:9px">EXPLORE WHAT'S POSSIBLE</div><div class="board-mini-op"><span class="app-ico" style="background:#f0eaff">🎓</span><div><strong>Find your scholarship</strong><small>Funding and financial aid</small></div><span class="arrow-dot">${ic('arrow',14)}</span></div><div class="board-mini-op"><span class="app-ico" style="background:#e5faf5">💼</span><div><strong>Explore internships</strong><small>Grow with hands-on experience</small></div><span class="arrow-dot">${ic('arrow',14)}</span></div><div class="board-mini-op"><span class="app-ico" style="background:#fff3e5">🏆</span><div><strong>Join a hackathon</strong><small>Build, compete and connect</small></div><span class="arrow-dot">${ic('arrow',14)}</span></div></div></div><div class="float-card one"><span class="float-icon">${ic('check',20)}</span><div><strong>One connected journey</strong><small>Your growth starts here</small></div></div><div class="float-card two"><span class="float-icon gold">${ic('trophy',20)}</span><div><strong>Achievement unlocked!</strong><small>Celebrate every milestone</small></div></div></div></div></section>`}
-function opportunityCard(o){const saved=isSaved(o.id);const demoLabel=o.status==='Demo';return `<article class="op-card"><div class="card-top"><span class="brand-avatar" style="background:${attr(o.color)};color:${attr(o.ink)}">${h(o.brand)}</span><button class="save-btn ${saved?'saved':''}" title="${saved?'Remove saved':'Save opportunity'}" data-save="${attr(o.id)}">${ic('bookmark',17)}</button></div><h3>${h(o.title)}</h3><div class="company-line">${h(o.org)} ${o.verified?`<span class="verified">${ic('shield',13)} Verified by Scholarku review</span>`:''}</div><div class="card-pills"><span class="badge ${o.type==='Scholarship'?'teal':o.type==='Competition'?'orange':''}">${h(o.type)}</span><span class="badge gray">${ic('pin',11)} ${h(o.location)}</span><span class="badge gray">${h(o.mode)}</span></div><div style="margin-top:14px">${demoLabel?'<span class="demo-tag">DEMO · NOT A REAL VACANCY</span>':`<span class="small-note">${h(o.field)}</span>`}</div><div class="op-footer"><span>${h(o.field||'All fields')}</span><a href="#/opportunity/${encodeURIComponent(o.id)}">View details ${ic('arrow',13)}</a></div></article>`}
-function heading(kicker,title,desc,link,label){return `<div class="section-heading"><div><div class="eyebrow">${kicker}</div><h2>${title}</h2><p>${desc}</p></div>${link?`<a class="text-link" href="#${link}">${label||'Explore all'} ${ic('arrow',16)}</a>`:''}</div>`}
-function featured(){return `<section class="section"><div class="container">${heading('CURATED FOR YOUR NEXT STEP','Opportunities worth exploring','Explore sample opportunities across Malaysia — always check official sources before applying.','/explore','View all opportunities')}<div class="tabs mb-20">${['All','Internship','Scholarship','Competition','Workshop'].map(x=>`<button class="tab ${state.type===x?'active':''}" data-type="${x}">${x==='All'?'Recommended':x+'s'}</button>`).join('')}</div><div class="grid-3">${(state.type==='All'?demo.slice(0,6):demo.filter(o=>o.type===state.type).slice(0,6)).map(opportunityCard).join('')}</div></div></section>`}
-function featureCards(){const rows=[['shield','Verified employer workflow','Companies submit evidence for manual admin review before publishing live internships.','/trust'],['pin','Local-first discovery','Discover scholarships and events by Malaysian state, field, and accessibility.','/explore'],['users','Communities that connect','Join interest-based spaces and learn from students on the same journey.','/community']];return `<section class="section section-quiet"><div class="container">${heading('MORE THAN A LISTING WEBSITE','Everything you need to move forward','Not just opportunities — the tools, preparation and connections to make the most of them.')}<div class="grid-4">${rows.map(([i,t,p,l])=>`<div class="feature-card"><div class="feature-icon">${ic(i,23)}</div><h3>${t}</h3><p>${p}</p><a class="text-link" href="#${l}">Learn more ${ic('arrow',14)}</a></div>`).join('')}</div></div></section>`}
-function communityFeature(){return `<section class="section community-section"><div class="container community-split"><div><div class="eyebrow">BETTER, TOGETHER</div><h2 style="font-size:34px;letter-spacing:-1.3px;margin:12px 0">Find your people.<br>Grow your circle.</h2><p style="color:#798499;font-size:14px;line-height:1.85">Join students who share your interests. Celebrate competition wins, share your projects, ask questions, and learn from each other in dedicated community channels.</p><div class="community-list"><div class="mini-server"><span>💻</span><div><strong>Tech & coding</strong><small>Build together</small></div></div><div class="mini-server"><span>🎓</span><div><strong>Scholarship tips</strong><small>Help each other</small></div></div><div class="mini-server"><span>🤖</span><div><strong>AI & data</strong><small>Stay curious</small></div></div><div class="mini-server"><span>🎨</span><div><strong>Creators</strong><small>Share your work</small></div></div></div>${btn('community','Explore communities')}</div><div class="community-illustration"><div class="fake-discord"><div class="fake-sidebar"><div>✦</div><div>💻</div><div>🎓</div><div>🤖</div></div><div class="fake-chat"><h4># general <span class="badge teal" style="float:right">Student community</span></h4><div class="fake-line"><span class="fake-dot">A</span><div class="fake-mess"><strong>Amir</strong><p>Anyone joining the hackathon this weekend? 👋</p></div></div><div class="fake-line"><span class="fake-dot green">S</span><div class="fake-mess"><strong>Sara</strong><p>Me! I'm looking for a teammate who knows Python.</p></div></div><div class="fake-line"><span class="fake-dot">N</span><div class="fake-mess"><strong>Nadia</strong><p>Let's build something awesome together! 🚀</p></div></div></div></div></div></div></section>`}
-function home(){return hero()+quickNav()+featured()+featureCards()+communityFeature()}
-function pageHero(kicker,title,desc){return `<section class="page-hero"><div class="container"><div class="eyebrow">${kicker}</div><div class="page-heading"><h1>${title}</h1><p>${desc}</p></div></div></section>`}
-const unique = key=>[...new Set(allOp().map(o=>o[key]).filter(Boolean))].sort();
-function explorePage(preset){let list=allOp();if(preset)list=list.filter(o=>o.type===preset || (preset==='Internship'&&o.type==='Graduate Programme'));if(state.type!=='All'&&!preset)list=list.filter(o=>o.type===state.type);if(state.search.trim()){const q=state.search.toLowerCase();list=list.filter(o=>Object.values(o).some(v=>typeof v==='string'&&v.toLowerCase().includes(q))||(o.skills||[]).join(' ').toLowerCase().includes(q))}if(state.field!=='All Fields')list=list.filter(o=>o.field===state.field||o.field==='All Fields');if(state.location!=='All Locations')list=list.filter(o=>o.location===state.location||o.location==='Malaysia-wide'||o.mode==='Remote');if(state.mode!=='Any Mode')list=list.filter(o=>o.mode===state.mode);if(state.industry!=='All Industries')list=list.filter(o=>o.industry===state.industry);if(state.companyType!=='All Types')list=list.filter(o=>o.category===state.companyType);if(state.level!=='All Levels')list=list.filter(o=>o.level===state.level||o.level==='All Levels');if(state.contract!=='Any Contract')list=list.filter(o=>o.contract===state.contract);const title=preset==='Internship'?'Internships & graduate programmes':preset==='Scholarship'?'Find your scholarship':'Explore opportunities';return pageHero('THE NEXT STEP STARTS HERE',title,'Scholarships, internships, graduate programmes, workshops and competitions — in one convenient place.')+`<div class="container page-content">${!preset?`<div class="page-subnav">${['All','Internship','Graduate Programme','Scholarship','Competition','Workshop'].map(x=>`<button class="tab ${state.type===x?'active':''}" data-type="${x}">${x}</button>`).join('')}</div>`:''}<div class="filter-bar">${ic('search',19)}<input id="filter-search" aria-label="Search listings" placeholder="Search title, provider, skills..." value="${attr(state.search)}" /><select id="filter-field" aria-label="Field of study"><option>All Fields</option>${unique('field').filter(x=>x!=='All Fields').map(x=>`<option ${state.field===x?'selected':''}>${h(x)}</option>`).join('')}</select><select id="filter-location" aria-label="Location"><option>All Locations</option>${unique('location').map(x=>`<option ${state.location===x?'selected':''}>${h(x)}</option>`).join('')}</select><select id="filter-mode" aria-label="Work arrangement"><option>Any Mode</option>${unique('mode').map(x=>`<option ${state.mode===x?'selected':''}>${h(x)}</option>`).join('')}</select>${preset==='Internship'?`<select id="filter-company" aria-label="Organization category"><option>All Types</option>${['MNC','SME','GLC','Startup','Firm'].map(x=>`<option ${state.companyType===x?'selected':''}>${x}</option>`).join('')}</select><select id="filter-contract" aria-label="Graduate programme contract"><option>Any Contract</option><option>With contract</option><option>No contract</option></select><select id="filter-level" aria-label="Education level"><option>All Levels</option>${unique('level').filter(x=>x!=='All Levels').map(x=>`<option ${state.level===x?'selected':''}>${h(x)}</option>`).join('')}</select>`:''}<button class="btn btn-outline btn-sm" data-act="reset-filters">${ic('refresh',15)} Reset</button></div><div class="inline-row justify-between mb-20"><p class="muted">Showing <strong>${list.length}</strong> opportunities</p><span class="demo-tag">Sample listings clearly labelled</span></div>${list.length?`<div class="grid-3">${list.map(opportunityCard).join('')}</div>`:empty('No matching opportunities','Try a different keyword, location or field.','reset-filters','Clear filters')}</div>`}
-function empty(title,desc,action,label){return `<div class="empty">${ic('search',27)}<h3>${title}</h3><p>${desc}</p>${action?btn(action,label,'outline'):''}</div>`}
-function detailPage(id){const o=allOp().find(x=>String(x.id)===id);if(!o)return pageHero('OPPORTUNITY','Listing not found','This opportunity may have been removed.')+`<div class="container page-content"><a class="text-link" href="#/explore">← Back to explore</a></div>`;return pageHero(o.type.toUpperCase(),'Opportunity details','Review the provider, eligibility and important information before applying.')+`<div class="container page-content"><div class="detail-layout"><article class="panel"><div class="inline-row mb-20"><span class="brand-avatar" style="background:${attr(o.color)};color:${attr(o.ink)}">${h(o.brand)}</span><div><div class="badge">${h(o.type)}</div><div class="company-line" style="margin:8px 0 0">${h(o.org)} ${o.verified?`<span class="verified">${ic('shield',13)} Verified by Scholarku review</span>`:''}</div></div></div><h2 style="font-size:28px;margin-bottom:7px">${h(o.title)}</h2><div class="detail-meta"><span>${ic('pin',15)} ${h(o.location)}</span><span>${ic('brief',15)} ${h(o.mode)}</span><span>${ic('cap',15)} ${h(o.field)}</span></div>${o.status==='Demo'?`<div class="alert mb-20"><strong>Demonstration listing:</strong> This opportunity and organization are fictional. It is not an active vacancy, scholarship or event, and no application will be sent to an employer.</div>`:''}<hr class="divider-line"><h3>About this opportunity</h3><p>${h(o.details)}</p><h3>Relevant skills & areas</h3><div class="chiplist">${(o.skills||[]).map(x=>`<span class="chip">${h(x)}</span>`).join('')}</div><h3>Eligibility & requirements</h3><p>Field: ${h(o.field)}<br>Education: ${h(o.level||'Refer to official provider')}<br>Always verify exact requirements through the organizer's official channels.</p><div class="detail-actions">${btn('apply:'+o.id,o.type==='Internship'?'Apply for internship':'Express interest')}<button class="btn btn-outline" data-save="${attr(o.id)}">${ic('bookmark',16)} ${isSaved(o.id)?'Saved':'Save for later'}</button>${o.status!=='Demo'?btn('report:'+o.id,'Report listing','outline'):''}</div></article><aside><div class="panel"><h2>Opportunity snapshot</h2><div class="facts"><div class="fact">${ic('building',20)}<div><small>Organization</small><strong>${h(o.org)}</strong></div></div><div class="fact">${ic('pin',20)}<div><small>Location</small><strong>${h(o.location)}</strong></div></div><div class="fact">${ic('brief',20)}<div><small>Arrangement</small><strong>${h(o.mode)}</strong></div></div><div class="fact">${ic('calendar',20)}<div><small>Duration</small><strong>${h(o.duration||'Not specified')}</strong></div></div>${o.type==='Graduate Programme'?`<div class="fact">${ic('file',20)}<div><small>Contract status</small><strong>${h(o.contract||'Not specified')}</strong></div></div>`:''}<div class="fact">${ic('gift',20)}<div><small>Allowance</small><strong>${h(o.allowance||'Not specified')}</strong></div></div><div class="fact">${ic('shield',20)}<div><small>Verification status</small><strong>${o.verified?'Reviewed & approved':'Not independently verified'}</strong></div></div></div></div><div class="alert info mt-18">Never pay an application fee to an unknown recruiter or share sensitive personal details outside a trusted hiring process.</div></aside></div></div>`}
-function communityPage(){return pageHero('YOUR PEOPLE ARE HERE','Find your community','Meet like-minded students, share achievements, and learn in topic-based channels.')+`<div class="container page-content"><div class="inline-row justify-between mb-20"><div><h2 style="margin:0 0 4px">Discover communities</h2><p class="muted" style="margin:0">Discord-inspired topic channels · Browser demo chat · No voice calling yet</p></div><button class="btn btn-outline btn-sm" data-act="post">${ic('plus',16)} Share an achievement</button></div><div class="grid-3">${communities.map(c=>`<article class="server-card"><div class="server-cover ${c.bg}">${c.emoji}</div><h3>${h(c.name)}</h3><p>${h(c.desc)}</p><div class="server-bottom"><span class="small-note">${h(c.members)}</span><a class="text-link" href="#/community/${c.id}">Enter community ${ic('arrow',14)}</a></div></article>`).join('')}</div><div class="panel mt-18"><div class="inline-row justify-between"><div><h2 style="margin:0 0 7px">Teach a skill. Learn a skill.</h2><p class="muted" style="margin:0">Join the skill-exchange channel to trade what you know — coding, design, SQL, presentations and more.</p></div><a class="btn btn-outline" href="#/community/tech">Browse skill exchange ${ic('arrow',15)}</a></div></div><div style="margin-top:44px">${heading('STUDENT CONNECT','Small wins. Big inspiration.','See what students are building and celebrating. Posts below are examples for the demo.')}<div class="grid-3">${store.posts.slice().reverse().map(p=>`<div class="story-card"><div class="inline-row"><span class="chat-avatar">${h(p.initial||initials(p.name))}</span><div><strong>${h(p.name)}</strong><br><span class="small-note">${h(p.type)} · Demo community post</span></div></div><h3 style="margin:17px 0 8px">${h(p.title)}</h3><p class="muted" style="font-size:12px;line-height:1.75">${h(p.content)}</p></div>`).join('')}</div></div></div>`}
-function serverPage(id){const c=communities.find(x=>x.id===id);if(!c)return communityPage();const channel=c.channels.includes(state.channel)?state.channel:'general';const key=id+'/'+channel;const messages=store.messages[key]||[{who:'Community guide',text:`Welcome to #${channel}! This is a demo student channel. Share useful tips, ask questions and be kind.`,time:'Pinned message'},{who:'Alya',text:channel==='hackathons'?'Any team looking for a frontend developer?':'What opportunity are you working towards this semester?',time:'Demo example'}];return pageHero('COMMUNITY SPACE',`${c.emoji} ${h(c.name)}`,c.desc)+`<div class="container page-content"><div class="inline-row justify-between mb-20"><a class="text-link" href="#/community">← All communities</a><span class="demo-tag">DEMO CHAT · STORED IN YOUR BROWSER</span></div><div class="server-layout"><aside class="server-channels"><strong class="channel-title" style="display:block">TEXT CHANNELS</strong>${c.channels.map(x=>`<button class="channel ${channel===x?'active':''}" data-channel="${x}">${x==='announcements'?ic('bell',15):'#'} ${h(x)}</button>`).join('')}<div class="channel-title">VOICE LOUNGE</div><button class="channel" data-act="voice-notice">${ic('video',16)} Student lounge</button></aside><section class="chat-pane"><div class="chat-top"># ${h(channel)} <span class="small-note" style="font-weight:400;margin-left:10px">${channel==='announcements'?'Updates from community organizers':'Student conversation'}</span></div><div class="chat-messages" id="chat-messages">${messages.map(m=>`<div class="chat-message"><span class="chat-avatar">${h(initials(m.who))}</span><div><strong>${h(m.who)}</strong><time>${h(m.time)}</time><p>${h(m.text)}</p></div></div>`).join('')}</div><form class="chat-compose" id="chat-form"><input name="message" maxlength="600" placeholder="Message #${h(channel)}" required aria-label="Community message"/><button class="btn btn-primary" type="submit">${ic('send',16)}</button></form></section></div></div>`}
-function mentorPage(){return pageHero('LEARN FROM EXPERIENCE','Mentorship that moves you forward','Discover student-friendly mentor profiles, request CV feedback, or practise a career conversation.')+`<div class="container page-content"><div class="alert info mb-20">Profiles below are fictional examples; no sessions will be booked with real professionals. Live mentor verification and scheduling integrations are planned.</div><div class="section-heading"><div><h2>Meet our sample mentors</h2><p>Choose a topic, prepare your questions, and practise reaching out.</p></div><button class="btn btn-outline" data-act="cv-review">${ic('file',16)} Request a CV review</button></div><div class="grid-3">${mentors.map(m=>`<article class="mentor-card"><div class="mentor-avatar" style="background:${m.color};color:${m.ink}">${m.initial}</div><span class="badge teal">${h(m.expertise)}</span><h3>${h(m.name)}</h3><div class="subtle">${h(m.role)}</div><p>${h(m.desc)}</p><button class="btn btn-outline" data-book="${m.id}">${ic('calendar',15)} Request a session</button></article>`).join('')}</div></div>`}
-function trustPage(){return pageHero('SAFETY IS A FEATURE','Trust, without false promises','Understand exactly what Scholarku reviews — and what verification does not mean.')+`<div class="container page-content"><div class="detail-layout"><div class="panel prose"><h2>How employer verification works</h2><div class="steps" style="grid-template-columns:1fr">${[['01','Employer profile','An organization registers and submits its legal name, official contact and relevant documents.'],['02','Human administrator review','An authorized reviewer assesses submitted evidence, asks for more information or rejects a request.'],['03','Decision & audit trail','Only approved organizations can post active internships. Decisions are logged and can be revoked.']].map(([n,t,p])=>`<div class="step"><span class="step-n">${n}</span><div><h4>${t}</h4><p>${p}</p></div></div>`).join('')}</div><hr class="divider-line"><h3>What verified means</h3><p>A verified indicator means an authorized Scholarku administrator reviewed the organization's submission according to platform policy. It does <strong>not</strong> mean endorsement by SSM, any government agency, or the university, and it does not guarantee a position is safe or legitimate forever.</p><h3>Demo versus real opportunities</h3><p>Every invented employer, vacancy, mentor, event and scholarship in this build is labelled as demo material. Demo admin approvals are simulated reviews and must not be mistaken for independent validation.</p><h3>Protecting your documents</h3><p>When the Supabase backend is configured, application files are stored in private buckets protected by authentication and database rules. In local demo mode, the app does not upload your CV to any server.</p></div><div class="panel" style="height:max-content"><h2>Spot a suspicious listing</h2><p>Be wary of requests for application payments, personal banking credentials, or off-platform identity documents before you have verified the organization.</p><p>Cross-check registration details with the relevant official authority and confirm that the company owns the contact channel.</p><button class="btn btn-primary w-full" data-nav="/internships">Browse internships ${ic('arrow',16)}</button></div></div></div>`}
-function dashboardPage(){const r=currentRole();if(r==='guest')return pageHero('YOUR SPACE','Your student dashboard','Save opportunities and monitor your applications.')+`<div class="container page-content">${empty('Create your student space','Log in to see your personalized dashboard.','signup','Join Scholarku')}</div>`;if(r==='employer')return employerPage();if(r==='admin')return adminPage();const tab=state.dashTab||'overview';const apps=API.enabled?state.liveApplications:store.applications;const saved=API.enabled?state.liveSaved.map(x=>x.opportunity_id):store.saved;const title=state.liveProfile?.full_name||store.profile.name||'Student';return pageHero('STUDENT SPACE',`Hi, ${h(title.split(' ')[0])} 👋`,'Your progress, opportunities, and next steps — all together.')+`<div class="container page-content"><div class="dashboard-layout"><aside class="dash-sidebar">${[['overview','book','Overview'],['applications','clipboard','My applications'],['saved','bookmark','Saved opportunities'],['profile','user','My profile']].map(([t,i,l])=>`<button class="dash-link ${tab===t?'active':''}" data-dash="${t}">${ic(i,17)} ${l}</button>`).join('')}<hr class="divider-line"><button class="dash-link" data-act="logout">${ic('logout',17)} Switch / log out</button></aside><div>${tab==='overview'?`<div class="stat-grid"><div class="stat-card"><div><strong>${saved.length}</strong><small>Saved opportunities</small></div>${ic('bookmark',21)}</div><div class="stat-card"><div><strong>${apps.length}</strong><small>Applications sent</small></div>${ic('clipboard',21)}</div><div class="stat-card"><div><strong>${store.meetings.length}</strong><small>Mentor requests (demo)</small></div>${ic('calendar',21)}</div></div><div class="panel"><div class="inline-row justify-between mb-20"><h2 style="margin:0">Your next step</h2><span class="badge teal">Keep growing</span></div><p>Explore new opportunities, connect with students, and prepare for your next application.</p><div class="inline-row">${btn('internships','Explore internships')}${btn('community','Community','outline')}</div></div><div class="panel mt-18"><h2>Recent applications</h2>${applicationTable(apps.slice(0,5))}</div>`:tab==='applications'?`<div class="panel"><h2>My applications</h2>${applicationTable(apps)}</div>`:tab==='saved'?`<div><div class="section-heading"><div><h2>Saved opportunities</h2><p>Your personal shortlist, stored ${API.enabled?'in your account':'on this browser'}.</p></div></div>${saved.length?`<div class="grid-3" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">${allOp().filter(o=>saved.includes(o.id)).map(opportunityCard).join('')}</div>`:empty('Nothing saved yet','Bookmark opportunities while browsing.','explore','Discover opportunities')}</div>`:profileForm()}</div></div></div>`}
-function applicationTable(apps){if(!apps.length)return `<div class="empty" style="padding:30px"><h3>No applications yet</h3><p>Submitted internship applications will appear here.</p><a class="text-link" href="#/internships">Explore internships ${ic('arrow',14)}</a></div>`;return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Opportunity</th><th>Status</th><th>Action</th></tr></thead><tbody>${apps.map(a=>{const o=allOp().find(x=>x.id===(a.opportunity_id||a.id));return `<tr><td><strong>${h(o?.title||'Internship')}</strong><br><span class="small-note">${h(o?.org||'Employer')}</span></td><td><span class="badge ${a.status==='Withdrawn'?'gray':'teal'}">${h(a.status||'Submitted')}</span></td><td>${a.status!=='Withdrawn'?`<button class="btn btn-outline btn-sm" data-withdraw="${attr(a.id)}">Withdraw</button>`:'—'}</td></tr>`}).join('')}</tbody></table></div>`}
-function profileForm(){const p=store.profile;return `<div class="panel"><h2>Student profile</h2><p>A stronger profile helps you keep track of your goals and preferred fields.</p><form id="profile-form" class="form-grid"><div class="field"><label>Full name</label><input name="name" required value="${attr(state.liveProfile?.full_name||p.name)}" /></div><div class="field"><label>Institution</label><input name="institution" required value="${attr(state.liveProfile?.institution||p.institution)}" /></div><div class="field"><label>Field of study</label><input name="field" required value="${attr(state.liveProfile?.field||p.field)}" /></div><div class="field"><label>Preferred location</label><input name="state" value="${attr(state.liveProfile?.location_state||p.state)}" /></div><div class="field wide"><label>Skills (comma separated)</label><input name="skills" value="${attr((state.liveProfile?.skills||p.skills||[]).join?.(', ')||p.skills)}" /></div><div class="wide"><button class="btn btn-primary" type="submit">Save profile</button></div></form></div>`}
-function employerPage(){if(currentRole()!=='employer')return pageHero('FOR ORGANIZATIONS','Meet your next great intern','Create a verified employer profile and connect with students across Malaysia.')+`<div class="container page-content"><div class="detail-layout"><div class="panel"><h2>Find students. Build tomorrow's talent.</h2><p>Organizations can register, provide verification evidence, publish internship listings after approval and manage applicants in one dashboard.</p><div class="steps" style="grid-template-columns:1fr"><div class="step"><span class="step-n">01</span><div><h4>Set up your organization</h4><p>Complete a company, university, agency, or eligible nonprofit profile.</p></div></div><div class="step"><span class="step-n">02</span><div><h4>Get reviewed</h4><p>Submit supporting information to an administrator for a genuine verification decision.</p></div></div><div class="step"><span class="step-n">03</span><div><h4>Publish & review applicants</h4><p>Approved organizations can create listings and manage student applications.</p></div></div></div><div class="inline-row mt-18">${btn('employer-signup','Register organization')}${btn('login','Log in','outline')}</div></div><div class="panel" style="height:max-content"><div class="feature-icon">${ic('shield',25)}</div><h2>Verified, with evidence</h2><p>Scholarku does not automatically approve an organization just because a website, email or registration number was submitted. A review decision is required.</p><a class="text-link" href="#/trust">Read verification policy ${ic('arrow',14)}</a></div></div></div>`;
-const org=API.enabled?state.liveOrgs.find(x=>x.owner_id===API.userId()):store.org;const verification=API.enabled?(org?.verification_status||'unverified'):store.verification;const mine=API.enabled?state.liveOpps.filter(x=>x.organization_id===org?.id):store.opportunityAdds;return pageHero('EMPLOYER PORTAL',`Welcome, ${h(org?.name||'organization')}`,'Manage verification, internship postings and candidates.')+`<div class="container page-content"><div class="stat-grid"><div class="stat-card"><div><strong>${mine.length}</strong><small>My opportunity listings</small></div>${ic('brief',23)}</div><div class="stat-card"><div><strong>${verification==='approved'||verification==='Approved'?'✓':'—'}</strong><small>Verification ${h(verification)}</small></div>${ic('shield',23)}</div><div class="stat-card"><div><strong>${API.enabled?state.liveApplications.length:store.applications.filter(x=>mine.some(y=>y.id===x.opportunity_id)).length}</strong><small>Applicants (visible)</small></div>${ic('users',23)}</div></div><div class="detail-layout"><div class="panel"><div class="inline-row justify-between"><h2>Organization profile</h2><span class="badge ${verification==='approved'||verification==='Approved'?'teal':'orange'}">${h(verification)}</span></div><form id="org-form" class="form-grid"><div class="field"><label>Organization name</label><input required name="name" value="${attr(org?.name||'')}" /></div><div class="field"><label>Industry</label><input name="industry" value="${attr(org?.industry||'')}" /></div><div class="field"><label>State / city</label><input name="location" value="${attr(org?.location_state||org?.location||'')}" /></div><div class="field"><label>Organization type</label><select name="category">${['SME','MNC','GLC','Startup','Firm','University','Government','Nonprofit'].map(x=>`<option ${org?.category===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Official website</label><input type="url" name="website" value="${attr(org?.website||'')}" placeholder="https://company.example" /></div><div class="field"><label>Registration no. (if applicable)</label><input name="registration" value="${attr(org?.registration_number||org?.registration||'')}" /></div><div class="wide"><button class="btn btn-primary" type="submit">Save organization</button></div></form><hr class="divider-line"><h2>Request verification</h2><p>A registration number alone does not count as approval. You can provide context and optionally supporting evidence for admin review.</p><form id="verify-form"><div class="field"><label>Supporting details / registration information</label><textarea name="note" required placeholder="Explain your organization's identity, official domain and evidence...">${h(org?.verification_note||'')}</textarea></div><div class="field"><label>Document (PDF or image; private in live mode)</label><input type="file" name="evidence" accept=".pdf,image/png,image/jpeg" /></div><button class="btn btn-outline" type="submit" ${verification==='approved'||verification==='Approved'?'disabled':''}>${ic('shield',16)} Submit for admin review</button></form><div class="alert info mt-18">${API.enabled?'Requests are reviewed by an authorized admin. Approved status is controlled by backend policies.':'Demo mode: switch to the demo admin role to review this sample request. This is not real-world identity validation.'}</div></div><aside><div class="panel"><h2>Publish an internship</h2><p>Only approved employers can publish a live listing.</p><button class="btn btn-primary w-full" data-act="new-listing" ${verification==='approved'||verification==='Approved'?'':'disabled'}>${ic('plus',16)} New internship</button><p class="small-note">${verification==='approved'||verification==='Approved'?'Verified: publishing enabled':'Verification required before publishing'}</p><hr class="divider-line"><h3>My listings</h3>${mine.length?`<div class="chiplist">${mine.map(x=>`<span class="chip">${h(x.title)}</span>`).join('')}</div>`:'<p>No listings yet.</p>'}</div><div class="panel mt-18"><h2>Applicant management</h2>${employerApplications(mine)}</div></aside></div></div>`}
-function employerApplications(mine){const apps=API.enabled?state.liveApplications:store.applications.filter(x=>mine.some(y=>y.id===x.opportunity_id));if(!apps.length)return '<p class="muted">No applications received yet.</p>';return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Applicant</th><th>Opportunity</th><th>Status</th><th>CV</th></tr></thead><tbody>${apps.map(a=>`<tr><td>${API.enabled?`<strong>${h(a.applicant_name||'Applicant')}</strong>`:'Demo Student'}</td><td>${h(allOp().find(x=>x.id===a.opportunity_id)?.title||'Internship')}</td><td><select data-status="${attr(a.id)}" aria-label="Change application status">${['Submitted','Under Review','Shortlisted','Interview','Offered','Rejected'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select></td><td>${API.enabled?`<button class="btn btn-outline btn-sm" data-cv="${attr(a.cv_path)}">View CV</button>`:'Demo only'}</td></tr>`).join('')}</tbody></table></div>`}
-function adminPage(){if(currentRole()!=='admin')return pageHero('ADMINISTRATION','Restricted area','Only authorized administrators can review and approve organizations.')+`<div class="container page-content">${empty('Administrator access required','Use the demo role switcher to explore a sample approval workflow.','login','Open demo login')}</div>`;const requests=API.enabled?state.liveVerification:store.verification==='Pending Review'?[{id:'demo-review',organization_id:'demo',status:'pending',notes:'Sample evidence submitted by demo employer'}]:[];return pageHero('ADMIN WORKSPACE','Platform oversight','Review employer evidence, manage trust status, and protect students.')+`<div class="container page-content"><div class="alert info mb-20">${API.enabled?'Live administrative actions are enforced by database role checks and recorded in an audit log.':'Demonstration administrator: this review is entirely simulated and does not confer real verification.'}</div><div class="stat-grid"><div class="stat-card"><div><strong>${requests.filter(x=>x.status==='pending').length}</strong><small>Pending reviews</small></div>${ic('clock',22)}</div><div class="stat-card"><div><strong>${API.enabled?state.liveOrgs.filter(o=>o.verification_status==='approved').length:Number(store.verification==='Approved')}</strong><small>Approved organizations</small></div>${ic('shield',22)}</div><div class="stat-card"><div><strong>${API.enabled?state.liveOpps.length:store.opportunityAdds.length}</strong><small>Published listings</small></div>${ic('brief',22)}</div></div><div class="panel"><h2>Employer verification queue</h2>${requests.length?`<div class="table-wrap"><table class="data-table"><thead><tr><th>Organization</th><th>Submitted evidence</th><th>State</th><th>Decision</th></tr></thead><tbody>${requests.map(q=>{const org=API.enabled?state.liveOrgs.find(o=>o.id===q.organization_id):store.org;return `<tr><td><strong>${h(org?.name||'Organization')}</strong><br><small>${h(org?.registration_number||org?.registration||'No registration provided')}</small></td><td>${h(q.notes||q.note||'Review organization profile')}</td><td><span class="badge orange">${h(q.status)}</span></td><td><div class="inline-row">${API.enabled?`<button class="btn btn-outline btn-sm" data-evidence="${attr(q.id)}">Evidence</button>`:''}<button class="btn btn-primary btn-sm" data-review="approve:${attr(q.id)}">Approve</button><button class="btn btn-outline btn-sm" data-review="reject:${attr(q.id)}">Reject</button></div></td></tr>`}).join('')}</tbody></table></div>`:empty('No pending reviews','New verification requests will appear here.')}</div>${!API.enabled?`<div class="panel mt-18"><h2>Sample organization</h2><p>${h(store.org.name)} · ${h(store.org.industry)} · ${h(store.verification)}</p><p class="small-note">To demonstrate the full workflow: switch to Employer, submit a verification request, switch to Admin and approve, then switch back to Employer and publish.</p></div>`:''}</div>`}
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const icons = {
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+    arrow: '<path d="M5 12h14m-6-6 6 6-6 6"/>',
+    chev: '<path d="m9 18 6-6-6-6"/>',
+    spark:
+      '<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/>',
+    cap: '<path d="m2 10 10-5 10 5-10 5-10-5Zm4 2.5V18c4 2.7 8 2.7 12 0v-5.5M22 10v7"/>',
+    brief:
+      '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>',
+    trophy:
+      '<path d="M8 21h8m-4-4v4M7 3h10v8a5 5 0 0 1-10 0V3ZM7 5H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4"/>',
+    users:
+      '<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2H3Zm14-14a3 3 0 0 1 0 6m1 3a5 5 0 0 1 3 5"/>',
+    code: '<path d="m8 8-4 4 4 4m8-8 4 4-4 4m-3-14-3 20"/>',
+    mentor:
+      '<rect x="2" y="4" width="20" height="15" rx="2"/><path d="M8 22h8m-4-3v3m-5-11 3 3 6-6"/>',
+    bookmark: '<path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v18l-7-5-7 5V4Z"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    pin: '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+    shield:
+      '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
+    check: '<path d="m4 12 5 5L20 6"/>',
+    close: '<path d="M5 5 19 19M19 5 5 19"/>',
+    menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+    calendar:
+      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/>',
+    message:
+      '<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 10 10 0 0 1-4-.9L3 21l1.9-5.5A9 9 0 0 1 3 11.5 9 9 0 0 1 12 3a9 9 0 0 1 9 8.5Z"/>',
+    book: '<path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v16H5a2 2 0 0 1-2-2V5Zm0 13a3 3 0 0 1 3-3h15"/>',
+    bolt: '<path d="m13 2-10 12h8l-1 8 11-12h-8l0-8Z"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2H4Z"/>',
+    bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 10h18c0-2-3-3-3-10Zm-8 13h4"/>',
+    clipboard:
+      '<rect x="5" y="5" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="5" rx="1"/><path d="M8 12h8m-8 4h8"/>',
+    filter: '<path d="M4 5h16L14 12v6l-4 2v-8L4 5Z"/>',
+    send: '<path d="m22 2-7 20-4-9-9-4 20-7ZM11 13l11-11"/>',
+    star: '<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z"/>',
+    external: '<path d="M14 4h6v6m0-6-9 9M20 14v6H4V4h6"/>',
+    file: '<path d="M6 2h9l5 5v15H6V2Zm9 0v5h5M9 12h8m-8 4h8"/>',
+    building:
+      '<rect x="4" y="3" width="16" height="19" rx="1"/><path d="M9 22v-5h6v5M8 7h2m4 0h2M8 12h2m4 0h2"/>',
+    logout: '<path d="M10 4H4v16h6m5-12 4 4-4 4m-11-4h15"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    play: '<path d="m8 5 11 7-11 7V5Z"/>',
+    refresh:
+      '<path d="M20 7v5h-5M4 17v-5h5m10-2a7 7 0 0 0-12-4L4 12m16 0-3 6a7 7 0 0 1-12-4"/>',
+    gift: '<rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 9v13M3 13h18M12 9C2 9 5 1 9 4c2 1 3 5 3 5Zm0 0c10 0 7-8 3-5-2 1-3 5-3 5Z"/>',
+    video:
+      '<rect x="2" y="5" width="14" height="14" rx="2"/><path d="m16 9 6-4v14l-6-4"/>',
+    lock: '<rect x="4" y="10" width="16" height="12" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/>',
+  };
+  const ic = (name, size = 18) =>
+    `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.spark}</svg>`;
+  const h = (x) =>
+    String(x ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const attr = h;
+  const initials = (n) =>
+    (n || "SK")
+      .split(" ")
+      .slice(0, 2)
+      .map((x) => x[0])
+      .join("")
+      .toUpperCase();
+  const defaults = {
+    saved: [],
+    applications: [],
+    messages: {},
+    posts: [],
+    meetings: [],
+    profile: {
+      name: "",
+      institution: "",
+      field: "",
+      state: "",
+      skills: "",
+    },
+    org: {
+      name: "Demo Campus Innovations",
+      industry: "Technology",
+      location: "Selangor",
+      website: "",
+      registration: "",
+    },
+    verification: "Not submitted",
+    roles: "guest",
+    isDemo: true,
+    opportunityAdds: [],
+  };
+  let store;
+  try {
+    store = {
+      ...defaults,
+      ...JSON.parse(localStorage.getItem("scholarku.demo") || "{}"),
+    };
+  } catch {
+    store = { ...defaults };
+  }
+  const persist = () =>
+    localStorage.setItem("scholarku.demo", JSON.stringify(store));
+  let state = {
+    route: parseRoute(),
+    search: "",
+    type: "All",
+    field: "All Fields",
+    location: "All Locations",
+    mode: "Any Mode",
+    industry: "All Industries",
+    companyType: "All Types",
+    contract: "Any Contract",
+    level: "All Levels",
+    channel: "general",
+    role: "student",
+    modal: "",
+    authMode: "signup",
+    mobile: false,
+    liveProfile: null,
+    liveOpps: [],
+    liveApplications: [],
+    liveSaved: [],
+    liveOrgs: [],
+    liveVerification: [],
+    loading: false,
+  };
+  function parseRoute() {
+    return decodeURI((location.hash || "#/").slice(1)).split("?")[0] || "/";
+  }
+  const route = (p) => {
+    location.hash = "#" + p;
+    state.route = p;
+    state.mobile = false;
+    window.scrollTo(0, 0);
+    render();
+  };
+  const allOp = () => (API.enabled ? state.liveOpps.map(normalise) : []);
+  function normalise(o) {
+    const org = state.liveOrgs.find((x) => x.id === o.organization_id);
+    return {
+      id: o.id,
+      type: o.kind || "Internship",
+      title: o.title,
+      org: org?.name || "Organization",
+      brand: initials(org?.name),
+      color: "#edeaff",
+      ink: "#6246ea",
+      industry: org?.industry || "Technology",
+      location: o.location_state || "Malaysia",
+      mode: o.work_mode || "On-site",
+      field: o.field || "All Fields",
+      level: o.education_level || "Undergraduate",
+      allowance: o.allowance || "Not specified",
+      category: org?.category || "Company",
+      contract: o.contract_type || "Not specified",
+      duration: o.duration || "Not specified",
+      status: o.is_demo ? "Demo" : o.status || "Published",
+      details: o.description || "",
+      skills: o.skills || [],
+      verified: org?.verification_status === "approved" && !o.is_demo,
+      organization_id: o.organization_id,
+      external_url: o.external_url || "",
+    };
+  }
+  function currentRole() {
+    return API.enabled ? state.liveProfile?.role || "guest" : store.roles;
+  }
+  function isLoggedIn() {
+    return API.enabled ? Boolean(API.session) : store.roles !== "guest";
+  }
+  function isSaved(id) {
+    return API.enabled && !String(id).startsWith("o")
+      ? state.liveSaved.some((s) => s.opportunity_id === id)
+      : store.saved.includes(id);
+  }
+  const toast = (txt) => {
+    const el = $("#toast");
+    el.textContent = txt;
+    el.hidden = false;
+    clearTimeout(window.__toast);
+    window.__toast = setTimeout(() => (el.hidden = true), 3800);
+  };
+  function btn(action, label, kind = "primary", extra = "") {
+    return `<button class="btn btn-${kind}" data-act="${action}" ${extra}>${label}</button>`;
+  }
+  function header() {
+    return window.ScholarkuNavigation.render(state.route, isLoggedIn());
+  }
+  function footer() {
+    const { tr } = window.SK;
+    return `<footer class="site-footer"><div class="container"><div class="footer-main"><div><a class="logo" href="#/">scholar<span class="dot">ku.</span></a><p>${tr("Scholarships, career pathways, mentoring and communities for students in Malaysia.", "Biasiswa, laluan kerjaya, bimbingan dan komuniti untuk pelajar di Malaysia.")}</p></div><div class="footer-col"><h4>${tr("Discover", "Teroka")}</h4><a href="#/scholarships">${tr("Scholarships & aid", "Biasiswa & bantuan")}</a><a href="#/internships">${tr("Internships", "Latihan industri")}</a><a href="#/graduates">${tr("Graduate programmes", "Program graduan")}</a></div><div class="footer-col"><h4>${tr("Connect", "Berhubung")}</h4><a href="#/community">${tr("Communities", "Komuniti")}</a><a href="#/mentors">${tr("Mentorship", "Bimbingan mentor")}</a><a href="#/mentors/requests">${tr("My mentoring requests", "Permohonan bimbingan saya")}</a></div><div class="footer-col"><h4>${tr("Your account", "Akaun anda")}</h4><a href="#/dashboard">${tr("My dashboard", "Papan pemuka saya")}</a><a href="#/trust">${tr("Privacy & sources", "Privasi & sumber")}</a></div></div><div class="footer-bottom"><span>${tr("© 2026 ScholarKu. Confirm programme terms with the official provider.", "© 2026 ScholarKu. Sahkan syarat program dengan penyedia rasmi.")}</span><span>${tr("Built for Malaysian students 🇲🇾", "Dibangunkan untuk pelajar Malaysia 🇲🇾")}</span></div></div></footer>`;
+  }
+  function home() {
+    return window.ScholarkuHome.render();
+  }
+  function pageHero(kicker, title, desc) {
+    return `<section class="page-hero"><div class="container"><div class="eyebrow">${kicker}</div><div class="page-heading"><h1>${title}</h1><p>${desc}</p></div></div></section>`;
+  }
+  const unique = (key) =>
+    [
+      ...new Set(
+        allOp()
+          .map((o) => o[key])
+          .filter(Boolean),
+      ),
+    ].sort();
+  function explorePage(preset) {
+    let list = allOp();
+    if (preset)
+      list = list.filter(
+        (o) =>
+          o.type === preset ||
+          (preset === "Internship" && o.type === "Graduate Programme"),
+      );
+    if (state.type !== "All" && !preset)
+      list = list.filter((o) => o.type === state.type);
+    if (state.search.trim()) {
+      const q = state.search.toLowerCase();
+      list = list.filter(
+        (o) =>
+          Object.values(o).some(
+            (v) => typeof v === "string" && v.toLowerCase().includes(q),
+          ) || (o.skills || []).join(" ").toLowerCase().includes(q),
+      );
+    }
+    if (state.field !== "All Fields")
+      list = list.filter(
+        (o) => o.field === state.field || o.field === "All Fields",
+      );
+    if (state.location !== "All Locations")
+      list = list.filter(
+        (o) =>
+          o.location === state.location ||
+          o.location === "Malaysia-wide" ||
+          o.mode === "Remote",
+      );
+    if (state.mode !== "Any Mode")
+      list = list.filter((o) => o.mode === state.mode);
+    if (state.industry !== "All Industries")
+      list = list.filter((o) => o.industry === state.industry);
+    if (state.companyType !== "All Types")
+      list = list.filter((o) => o.category === state.companyType);
+    if (state.level !== "All Levels")
+      list = list.filter(
+        (o) => o.level === state.level || o.level === "All Levels",
+      );
+    if (state.contract !== "Any Contract")
+      list = list.filter((o) => o.contract === state.contract);
+    const title =
+      preset === "Internship"
+        ? "Internships & graduate programmes"
+        : preset === "Scholarship"
+          ? "Find your scholarship"
+          : "Explore opportunities";
+    return (
+      pageHero(
+        "THE NEXT STEP STARTS HERE",
+        title,
+        "Scholarships, internships, graduate programmes, workshops and competitions — in one convenient place.",
+      ) +
+      `<div class="container page-content">${!preset ? `<div class="page-subnav">${["All", "Internship", "Graduate Programme", "Scholarship", "Competition", "Workshop"].map((x) => `<button class="tab ${state.type === x ? "active" : ""}" data-type="${x}">${x}</button>`).join("")}</div>` : ""}<div class="filter-bar">${ic("search", 19)}<input id="filter-search" aria-label="Search listings" placeholder="Search title, provider, skills..." value="${attr(state.search)}" /><select id="filter-field" aria-label="Field of study"><option>All Fields</option>${unique(
+        "field",
+      )
+        .filter((x) => x !== "All Fields")
+        .map(
+          (x) =>
+            `<option ${state.field === x ? "selected" : ""}>${h(x)}</option>`,
+        )
+        .join(
+          "",
+        )}</select><select id="filter-location" aria-label="Location"><option>All Locations</option>${unique(
+        "location",
+      )
+        .map(
+          (x) =>
+            `<option ${state.location === x ? "selected" : ""}>${h(x)}</option>`,
+        )
+        .join(
+          "",
+        )}</select><select id="filter-mode" aria-label="Work arrangement"><option>Any Mode</option>${unique(
+        "mode",
+      )
+        .map(
+          (x) =>
+            `<option ${state.mode === x ? "selected" : ""}>${h(x)}</option>`,
+        )
+        .join("")}</select>${
+        preset === "Internship"
+          ? `<select id="filter-company" aria-label="Organization category"><option>All Types</option>${["MNC", "SME", "GLC", "Startup", "Firm"].map((x) => `<option ${state.companyType === x ? "selected" : ""}>${x}</option>`).join("")}</select><select id="filter-contract" aria-label="Graduate programme contract"><option>Any Contract</option><option>With contract</option><option>No contract</option></select><select id="filter-level" aria-label="Education level"><option>All Levels</option>${unique(
+              "level",
+            )
+              .filter((x) => x !== "All Levels")
+              .map(
+                (x) =>
+                  `<option ${state.level === x ? "selected" : ""}>${h(x)}</option>`,
+              )
+              .join("")}</select>`
+          : ""
+      }<button class="btn btn-outline btn-sm" data-act="reset-filters">${ic("refresh", 15)} Reset</button></div><div class="inline-row justify-between mb-20"><p class="muted">Showing <strong>${list.length}</strong> opportunities</p><span class="demo-tag">Sample listings clearly labelled</span></div>${list.length ? `<div class="grid-3">${list.map(opportunityCard).join("")}</div>` : empty("No matching opportunities", "Try a different keyword, location or field.", "reset-filters", "Clear filters")}</div>`
+    );
+  }
+  function empty(title, desc, action, label) {
+    return `<div class="empty">${ic("search", 27)}<h3>${title}</h3><p>${desc}</p>${action ? btn(action, label, "outline") : ""}</div>`;
+  }
+  function detailPage(id) {
+    const o = allOp().find((x) => String(x.id) === id);
+    if (!o)
+      return (
+        pageHero(
+          "OPPORTUNITY",
+          "Listing not found",
+          "This opportunity may have been removed.",
+        ) +
+        `<div class="container page-content"><a class="text-link" href="#/explore">← Back to explore</a></div>`
+      );
+    return (
+      pageHero(
+        o.type.toUpperCase(),
+        "Opportunity details",
+        "Review the provider, eligibility and important information before applying.",
+      ) +
+      `<div class="container page-content"><div class="detail-layout"><article class="panel"><div class="inline-row mb-20"><span class="brand-avatar" style="background:${attr(o.color)};color:${attr(o.ink)}">${h(o.brand)}</span><div><div class="badge">${h(o.type)}</div><div class="company-line" style="margin:8px 0 0">${h(o.org)} ${o.verified ? `<span class="verified">${ic("shield", 13)} Verified by Scholarku review</span>` : ""}</div></div></div><h2 style="font-size:28px;margin-bottom:7px">${h(o.title)}</h2><div class="detail-meta"><span>${ic("pin", 15)} ${h(o.location)}</span><span>${ic("brief", 15)} ${h(o.mode)}</span><span>${ic("cap", 15)} ${h(o.field)}</span></div>${o.status === "Demo" ? `<div class="alert mb-20"><strong>Demonstration listing:</strong> This opportunity and organization are fictional. It is not an active vacancy, scholarship or event, and no application will be sent to an employer.</div>` : ""}<hr class="divider-line"><h3>About this opportunity</h3><p>${h(o.details)}</p><h3>Relevant skills & areas</h3><div class="chiplist">${(o.skills || []).map((x) => `<span class="chip">${h(x)}</span>`).join("")}</div><h3>Eligibility & requirements</h3><p>Field: ${h(o.field)}<br>Education: ${h(o.level || "Refer to official provider")}<br>Always verify exact requirements through the organizer's official channels.</p><div class="detail-actions">${btn("apply:" + o.id, o.type === "Internship" ? "Apply for internship" : "Express interest")}<button class="btn btn-outline" data-save="${attr(o.id)}">${ic("bookmark", 16)} ${isSaved(o.id) ? "Saved" : "Save for later"}</button>${o.status !== "Demo" ? btn("report:" + o.id, "Report listing", "outline") : ""}</div></article><aside><div class="panel"><h2>Opportunity snapshot</h2><div class="facts"><div class="fact">${ic("building", 20)}<div><small>Organization</small><strong>${h(o.org)}</strong></div></div><div class="fact">${ic("pin", 20)}<div><small>Location</small><strong>${h(o.location)}</strong></div></div><div class="fact">${ic("brief", 20)}<div><small>Arrangement</small><strong>${h(o.mode)}</strong></div></div><div class="fact">${ic("calendar", 20)}<div><small>Duration</small><strong>${h(o.duration || "Not specified")}</strong></div></div>${o.type === "Graduate Programme" ? `<div class="fact">${ic("file", 20)}<div><small>Contract status</small><strong>${h(o.contract || "Not specified")}</strong></div></div>` : ""}<div class="fact">${ic("gift", 20)}<div><small>Allowance</small><strong>${h(o.allowance || "Not specified")}</strong></div></div><div class="fact">${ic("shield", 20)}<div><small>Verification status</small><strong>${o.verified ? "Reviewed & approved" : "Not independently verified"}</strong></div></div></div></div><div class="alert info mt-18">Never pay an application fee to an unknown recruiter or share sensitive personal details outside a trusted hiring process.</div></aside></div></div>`
+    );
+  }
+  function communityPage() {
+    return window.ScholarkuCommunity.render("/community");
+  }
+  function serverPage(id) {
+    return window.ScholarkuCommunity.render("/community/" + id);
+  }
+  function mentorPage() {
+    return window.ScholarkuMentorship.render(state.route);
+  }
+  function trustPage() {
+    const { tr, title } = window.SK;
+    return (
+      title(
+        tr("PRIVACY & SOURCES", "PRIVASI & SUMBER"),
+        tr(
+          "Know what you share. Know your sources.",
+          "Fahami perkongsian anda. Kenali sumber anda.",
+        ),
+        tr(
+          "Clear information about mentoring, communities and opportunity data.",
+          "Maklumat jelas tentang bimbingan, komuniti dan data peluang.",
+        ),
+      ) +
+      `<div class="container page-content"><article class="panel opportunity-prose"><h2>${tr("Your CV stays private", "CV anda kekal peribadi")}</h2><p>${tr("CVs are uploaded to private storage. Only you and the selected participating mentor can access a mentoring CV. Requests to public references wait until the mentor enrols; no CV is sent to a public profile. Document links expire after one minute.", "CV dimuat naik ke storan peribadi. Hanya anda dan mentor berdaftar yang dipilih boleh mengakses CV bimbingan. Permohonan kepada rujukan awam menunggu pendaftaran mentor; tiada CV dihantar ke profil awam. Pautan dokumen luput selepas satu minit.")}</p><h2>${tr("Real conversations", "Perbualan sebenar")}</h2><p>${tr("Community rooms require sign-in and confirmed membership. Messages show the author’s account profile name and are visible to enrolled members. New rooms start empty. You can delete your messages and report abuse; leaving a room does not delete earlier messages.", "Ruang komuniti memerlukan log masuk dan pengesahan keahlian. Mesej memaparkan nama profil akaun penulis dan boleh dilihat ahli berdaftar. Ruang baharu bermula kosong. Anda boleh memadam mesej sendiri dan melaporkan penderaan; keluar komuniti tidak memadam mesej terdahulu.")}</p><h2>${tr("Public profiles and enrolment", "Profil awam dan pendaftaran")}</h2><p>${tr("A public professional profile is a discovery reference, not a claim of partnership or availability. Participating mentors must agree to join and have their account linked after an identity check. Public job descriptions are not employment endorsements.", "Profil profesional awam ialah rujukan penemuan, bukan dakwaan kerjasama atau ketersediaan. Mentor yang menyertai perlu bersetuju dan akaun mereka dipautkan selepas semakan identiti. Penerangan pekerjaan awam bukan pengesahan pekerjaan.")}</p><h2>${tr("Career and funding sources", "Sumber kerjaya dan pembiayaan")}</h2><p>${tr("Provider portals do not establish current vacancies or scholarship intakes. General preparation guidance is separate from confirmed role requirements. User-supplied amounts and deadlines are labelled for official confirmation. Never pay an unknown recruiter or rely on an old intake deadline.", "Portal penyedia tidak membuktikan kekosongan atau pengambilan biasiswa semasa. Panduan persediaan umum berbeza daripada syarat jawatan yang disahkan. Amaun dan tarikh yang diberi pengguna ditanda untuk pengesahan rasmi. Jangan bayar perekrut tidak dikenali atau bergantung pada tarikh pengambilan lama.")}</p></article></div>`
+    );
+  }
+  function dashboardPage() {
+    const r = currentRole();
+    if (r === "guest")
+      return (
+        pageHero(
+          "YOUR SPACE",
+          "Your student dashboard",
+          "Save opportunities and monitor your applications.",
+        ) +
+        `<div class="container page-content">${empty("Create your student space", "Log in to see your personalized dashboard.", "signup", "Join Scholarku")}</div>`
+      );
+    const tab = state.dashTab || "overview";
+    const apps = API.enabled ? state.liveApplications : store.applications;
+    const saved = Array(window.ScholarkuOpportunities.savedCount());
+    const title =
+      state.liveProfile?.full_name || store.profile.name || "Student";
+    return (
+      pageHero(
+        "STUDENT SPACE",
+        `Hi, ${h(title.split(" ")[0])} 👋`,
+        "Your progress, opportunities, and next steps — all together.",
+      ) +
+      `<div class="container page-content"><div class="dashboard-layout"><aside class="dash-sidebar">${[
+        ["overview", "book", "Overview"],
+        ["applications", "clipboard", "My applications"],
+        ["saved", "bookmark", "Saved opportunities"],
+        ["profile", "user", "My profile"],
+      ]
+        .map(
+          ([t, i, l]) =>
+            `<button class="dash-link ${tab === t ? "active" : ""}" data-dash="${t}">${ic(i, 17)} ${l}</button>`,
+        )
+        .join(
+          "",
+        )}<a class="dash-link" href="#/mentors/requests">${ic("calendar", 17)} Mentor requests</a><hr class="divider-line"><button class="dash-link" data-act="logout">${ic("logout", 17)} Switch / log out</button></aside><div>${
+        tab === "overview"
+          ? `<div class="stat-grid"><div class="stat-card"><div><strong>${saved.length}</strong><small>Saved opportunities</small></div>${ic("bookmark", 21)}</div><div class="stat-card"><div><strong>${apps.length}</strong><small>Applications sent</small></div>${ic("clipboard", 21)}</div><div class="stat-card"><div><strong id="mentor-request-count">—</strong><small><a href="#/mentors/requests">Mentor requests</a></small></div>${ic("calendar", 21)}</div></div><div class="panel"><div class="inline-row justify-between mb-20"><h2 style="margin:0">Your next step</h2><span class="badge teal">Keep growing</span></div><p>Explore new opportunities, connect with students, and prepare for your next application.</p><div class="inline-row">${btn("internships", "Explore internships")}${btn("community", "Community", "outline")}</div></div><div class="panel mt-18"><h2>Recent applications</h2>${applicationTable(apps.slice(0, 5))}</div>`
+          : tab === "applications"
+            ? `<div class="panel"><h2>My applications</h2>${applicationTable(apps)}</div>`
+            : tab === "saved"
+              ? `<div><div class="section-heading"><div><h2>Saved opportunities</h2><p>${window.SK.tr("Your saved career and funding pages.", "Laman kerjaya dan pembiayaan anda yang disimpan.")}</p></div></div>${
+                  saved.length
+                    ? window.ScholarkuOpportunities.savedPage()
+                    : empty(
+                        "Nothing saved yet",
+                        "Bookmark opportunities while browsing.",
+                        "explore",
+                        "Discover opportunities",
+                      )
+                }</div>`
+              : profileForm()
+      }</div></div></div>`
+    );
+  }
+  function applicationTable(apps) {
+    if (!apps.length)
+      return `<div class="empty" style="padding:30px"><h3>No applications yet</h3><p>Submitted internship applications will appear here.</p><a class="text-link" href="#/internships">Explore internships ${ic("arrow", 14)}</a></div>`;
+    return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Opportunity</th><th>Status</th><th>Action</th></tr></thead><tbody>${apps
+      .map((a) => {
+        const o = allOp().find((x) => x.id === (a.opportunity_id || a.id));
+        return `<tr><td><strong>${h(o?.title || "Internship")}</strong><br><span class="small-note">${h(o?.org || "Employer")}</span></td><td><span class="badge ${a.status === "Withdrawn" ? "gray" : "teal"}">${h(a.status || "Submitted")}</span></td><td>${a.status !== "Withdrawn" ? `<button class="btn btn-outline btn-sm" data-withdraw="${attr(a.id)}">Withdraw</button>` : "—"}</td></tr>`;
+      })
+      .join("")}</tbody></table></div>`;
+  }
+  function profileForm() {
+    const p = API.enabled
+      ? {
+          name: state.liveProfile?.full_name || "",
+          institution: state.liveProfile?.institution || "",
+          field: state.liveProfile?.field || "",
+          state: state.liveProfile?.location_state || "",
+          skills: (state.liveProfile?.skills || []).join(", "),
+        }
+      : store.profile;
+    return `<div class="panel"><h2>Student profile</h2><p>A stronger profile helps you keep track of your goals and preferred fields.</p><form id="profile-form" class="form-grid"><div class="field"><label>Full name</label><input name="name" required value="${attr(p.name)}" /></div><div class="field"><label>Institution</label><input name="institution" required value="${attr(p.institution)}" /></div><div class="field"><label>Field of study</label><input name="field" required value="${attr(p.field)}" /></div><div class="field"><label>Preferred location</label><input name="state" value="${attr(p.state)}" /></div><div class="field wide"><label>Skills (comma separated)</label><input name="skills" value="${attr(p.skills)}" /></div><div class="wide"><button class="btn btn-primary" type="submit">Save profile</button></div></form></div>`;
+  }
 
-function modalContent(){if(state.modal==='post')return popup('Share your milestone','Let other students know what you learned or achieved.',`<form id="post-form"><div class="field"><label>Post title</label><input name="title" maxlength="90" required placeholder="I finished my first hackathon!" /></div><div class="field"><label>Tell your story</label><textarea name="content" maxlength="1000" required placeholder="What did you learn? How can others get involved?"></textarea></div><button class="btn btn-primary" type="submit">Publish sample post ${ic('send',15)}</button></form>`);if(state.modal.startsWith('book:')){const m=mentors.find(x=>x.id===state.modal.split(':')[1]);return popup('Request a mentoring session',`You're requesting a <strong>demo</strong> session with ${h(m?.name||'a mentor')}. This does not send an invitation to a real person.`,`<form id="book-form"><div class="field"><label>What would you like help with?</label><textarea required name="topic" placeholder="CV feedback, career planning, interview tips..."></textarea></div><button type="submit" class="btn btn-primary">Save demo request ${ic('check',15)}</button></form>`)}if(state.modal==='cv')return popup('Request a CV review','Record a sample review request. Files are not uploaded in demo mode.',`<form id="cv-form"><div class="field"><label>What would you like feedback on?</label><textarea name="note" required placeholder="My software engineering CV and project descriptions..."></textarea></div><div class="field"><label>Attach CV (optional; not uploaded in demo)</label><input type="file" accept=".pdf,.doc,.docx" /></div><button class="btn btn-primary" type="submit">Save request</button></form>`);if(state.modal.startsWith('apply:')){const o=allOp().find(x=>x.id===state.modal.split(':')[1]);return popup('Apply to '+h(o?.title||'internship'),o?.status==='Demo'?'This is a sample listing. You can save it but cannot send an application to a fictional employer.':'Submit your application. Your résumé will be stored privately for the employer to review.',o?.status==='Demo'?`<div class="alert">Fictional demo vacancies are not accepting real applications. This protects you from submitting personal documents to a non-existent company.</div><div class="inline-row mt-18"><button class="btn btn-primary" data-save="${attr(o.id)}">Save this sample instead</button></div>`:`<form id="apply-form"><input type="hidden" name="opportunity_id" value="${attr(o.id)}"><div class="field"><label>Short cover note</label><textarea name="cover_note" placeholder="Why are you a good fit?" required></textarea></div><div class="field"><label>Upload CV (PDF; max 5MB)</label><input name="cv" type="file" accept="application/pdf" required /></div><button class="btn btn-primary" type="submit">Submit application</button></form>`)}if(state.modal==='new-listing')return popup('Create internship opportunity','Only approved employers can publish a listing. Do not invent salary or deadlines.',`<form id="listing-form" class="form-grid"><div class="field wide"><label>Internship title</label><input required name="title" placeholder="Frontend Developer Intern" /></div><div class="field"><label>Field of study</label><select name="field"><option>Computer Science</option><option>Data Science</option><option>Cybersecurity</option><option>IT & Networking</option><option>Design</option><option>Business</option><option>Finance</option></select></div><div class="field"><label>State</label><select name="location">${['Selangor','Kuala Lumpur','Johor','Penang','Perak','Sabah','Sarawak','Terengganu','Kelantan','Kedah','Pahang','Negeri Sembilan','Melaka','Perlis','Putrajaya','Labuan'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Work arrangement</label><select name="mode"><option>On-site</option><option>Hybrid</option><option>Remote</option></select></div><div class="field"><label>Duration</label><input name="duration" placeholder="3 months" /></div><div class="field wide"><label>Description and requirements</label><textarea name="description" required placeholder="Describe tasks, required skills and eligibility..."></textarea></div><button class="btn btn-primary wide" type="submit">Publish internship ${ic('arrow',15)}</button></form>`);if(state.modal.startsWith('report:'))return popup('Report suspicious listing','Reports are reviewed by authorized administrators.',`<form id="report-form"><input type="hidden" name="opportunity_id" value="${attr(state.modal.split(':')[1])}"><div class="field"><label>Reason</label><textarea name="reason" required placeholder="Explain what looks suspicious..."></textarea></div><button class="btn btn-primary">Submit report</button></form>`);return ''}
-function popup(title,sub,content){return `<div class="auth-modal-bg" id="modal-overlay" role="presentation"><div class="modal ${state.modal==='new-listing'?'wide-modal':''}" role="dialog" aria-modal="true" aria-labelledby="popup-title"><button class="modal-x" data-act="close" aria-label="Close">${ic('close',17)}</button><h2 id="popup-title">${title}</h2><p>${sub}</p>${content}</div></div>`}
-async function syncLive(){if(!API.enabled)return;try{const [organizations,opportunities]=await Promise.all([API.rest('organizations',{select:'id,owner_id,name,industry,category,location_state,website,registration_number,verification_status'}),API.rest('opportunities',{select:'*',filters:'status=eq.published',order:'created_at.desc'})]);state.liveOrgs=organizations||[];state.liveOpps=opportunities||[];if(API.session&&API.userId()){const [profile,applications,saved,requests]=await Promise.all([API.rest('profiles',{filters:'id=eq.'+API.userId()}),API.rest('applications',{select:'*'}),API.rest('saved_opportunities',{select:'opportunity_id'}),API.rest('organization_verification_requests',{select:'*',order:'created_at.desc'})]);state.liveProfile=profile?.[0]||null;state.liveApplications=applications||[];state.liveSaved=saved||[];state.liveVerification=requests||[]}else{state.liveProfile=null;state.liveApplications=[];state.liveSaved=[];state.liveVerification=[]}}catch(err){console.warn('Live database sync failed',err);toast('Live data unavailable: '+err.message)}}
-window.scholarkuRender = render;
-function render(){state.route=parseRoute();if(state.route==='/assessments'||state.route.startsWith('/assessment/')){location.replace('#/explore');return;}const p=state.route;let main;if(p==='/')main=home();else if(p==='/explore')main=explorePage();else if(p==='/internships')main=explorePage('Internship');else if(p==='/scholarships')main=explorePage('Scholarship');else if(p.startsWith('/opportunity/'))main=detailPage(p.slice(13));else if(p==='/community')main=communityPage();else if(p.startsWith('/community/'))main=serverPage(p.split('/')[2]);else if(p==='/login'||p==='/signup')main=window.ScholarkuAuth.render();else if(p==='/mentors')main=mentorPage();else if(p==='/dashboard'||p==='/profile')main=dashboardPage();else if(p==='/employers')main=employerPage();else if(p==='/admin')main=adminPage();else if(p==='/trust')main=trustPage();else main=home();$('#app').innerHTML=header()+`<main id="main-content">${main}</main>`+footer()+(state.modal?modalContent():'');document.dispatchEvent(new Event('scholarku:render'));if(p.startsWith('/community/')){const box=$('#chat-messages');if(box)box.scrollTop=box.scrollHeight;}}
-function openAuth(mode='login',role='student'){state.modal='';state.authMode=mode;state.role=role;route(mode==='signup'?'/signup':'/login')}
-async function saveOpportunity(id){if(!isLoggedIn()){openAuth();return}try{if(API.enabled&&!id.startsWith('o')&&!id.startsWith('demo-')){if(isSaved(id)){await API.rest('saved_opportunities',{method:'DELETE',filters:'opportunity_id=eq.'+id});toast('Removed from shortlist')}else{await API.rest('saved_opportunities',{method:'POST',body:{opportunity_id:id,user_id:API.userId()}});toast('Saved to your shortlist')}await syncLive()}else{store.saved=store.saved.includes(id)?store.saved.filter(x=>x!==id):[...store.saved,id];persist();toast(store.saved.includes(id)?'Saved to your shortlist':'Removed from shortlist')}state.modal='';render()}catch(err){toast(err.message)}}
-async function review(reqId,decision){const reason=window.prompt(`Reason for ${decision} decision (recorded in the audit trail):`,decision==='approve'?'Evidence reviewed and accepted':'Evidence incomplete or inconsistent');if(reason===null||!reason.trim())return;try{if(API.enabled){await API.rpc('review_verification',{p_request_id:reqId,p_decision:decision==='approve'?'approved':'rejected',p_reason:reason});await syncLive()}else{store.verification=decision==='approve'?'Approved':'Rejected';persist()}toast((decision==='approve'?'Approved':'Rejected')+(API.enabled?' and logged':' — demo decision only'));render()}catch(err){toast(err.message)}}
-async function withdraw(id){if(!confirm('Withdraw this application?'))return;try{if(API.enabled){await API.rest('applications',{method:'PATCH',filters:'id=eq.'+id,body:{status:'Withdrawn'}});await syncLive()}else{const a=store.applications.find(x=>x.id===id);if(a)a.status='Withdrawn';persist()}toast('Application withdrawn');render()}catch(err){toast(err.message)}}
-function act(name){if(name==='mobile'){state.mobile=!state.mobile;render();return}if(name==='close'){state.modal='';render();return}if(name==='login'||name==='signup'){openAuth(name);return}if(name==='employer-signup'){openAuth('signup','employer');return}if(['dashboard','explore','internships','graduates','community'].includes(name)){route('/'+(name==='dashboard'?'dashboard':name));return}if(name==='reset-filters'){Object.assign(state,{search:'',type:'All',field:'All Fields',location:'All Locations',mode:'Any Mode',industry:'All Industries',companyType:'All Types',contract:'Any Contract',level:'All Levels'});render();return}if(name==='logout'){if(API.enabled){API.signOut().then(()=>{syncLive().then(()=>{toast('Signed out');route('/')})})}else{store.roles='guest';persist();toast('Demo session ended');route('/')}return}if(name==='post'){if(!isLoggedIn())return openAuth();state.modal='post';render();return}if(name==='cv-review'){if(!isLoggedIn())return openAuth();state.modal='cv';render();return}if(name==='voice-notice'){toast('Voice calls need a real-time voice provider. Text chat is available in this demo.');return}if(name==='new-listing'){const org=API.enabled?state.liveOrgs.find(x=>x.owner_id===API.userId()):store.org;const status=API.enabled?org?.verification_status:store.verification;if(!['Approved','approved'].includes(status))return toast('Employer must be approved first');state.modal='new-listing';render();return}if(name.startsWith('apply:')){if(!isLoggedIn())return openAuth();if(currentRole()!=='student')return toast('Only students can apply');state.modal=name;render();return}if(name.startsWith('report:')){state.modal=name;render();return}}
-function asForm(f){return Object.fromEntries(new FormData(f).entries())}
-async function formSubmit(e){const form=e.target;if(!form.id)return;e.preventDefault();const d=asForm(form);try{
- if(form.id==='hero-search'){state.search=(d.query||'').trim();state.type='All';route('/explore');return}
-  if(form.id==='profile-form'){const skills=d.skills.split(',').map(s=>s.trim()).filter(Boolean);store.profile={name:d.name,institution:d.institution,field:d.field,state:d.state,skills:d.skills};persist();if(API.enabled){await API.rest('profiles',{method:'PATCH',filters:'id=eq.'+API.userId(),body:{full_name:d.name,institution:d.institution,field:d.field,location_state:d.state,skills}});await syncLive()}toast('Student profile updated');render();return}
- if(form.id==='post-form'){store.posts.push({id:'p'+Date.now(),name:state.liveProfile?.full_name||store.profile.name||'Student',initial:initials(store.profile.name),title:d.title,content:d.content,type:'Achievement'});persist();state.modal='';toast('Achievement shared in demo community');route('/community');return}
- if(form.id==='chat-form'){const id=state.route.split('/')[2],channel=state.channel;const key=id+'/'+channel;store.messages[key]=store.messages[key]||[{who:'Community guide',text:'Welcome to this community channel!',time:'Pinned'}];store.messages[key].push({who:state.liveProfile?.full_name||store.profile.name||'Demo Student',text:d.message.trim(),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});persist();render();return}
- if(form.id==='book-form'){store.meetings.push({mentor:state.modal.split(':')[1],topic:d.topic,created:Date.now()});persist();state.modal='';toast('Demo mentor request saved to dashboard');render();return}
- if(form.id==='cv-form'){store.meetings.push({mentor:'CV review',topic:d.note,created:Date.now()});persist();state.modal='';toast('Demo CV review request saved — no files uploaded');render();return}
- if(form.id==='org-form'){const update={name:d.name,industry:d.industry,category:d.category,location_state:d.location,website:d.website||null,registration_number:d.registration||null};if(API.enabled){const org=state.liveOrgs.find(x=>x.owner_id===API.userId());if(org)await API.rest('organizations',{method:'PATCH',filters:'id=eq.'+org.id,body:update});else await API.rest('organizations',{method:'POST',body:{...update,owner_id:API.userId()}});await syncLive()}else{store.org={...store.org,...update,location:d.location,registration:d.registration};persist()}toast('Organization profile saved');render();return}
- if(form.id==='verify-form'){if(API.enabled){const org=state.liveOrgs.find(x=>x.owner_id===API.userId());if(!org)throw new Error('Save the organization profile first');const result=await API.rest('organization_verification_requests',{method:'POST',body:{organization_id:org.id,notes:d.note,status:'pending'}});const file=form.querySelector('[name=evidence]').files?.[0];if(file){if(file.size>5*1024*1024)throw new Error('Evidence must be under 5MB');const allowed=['application/pdf','image/png','image/jpeg'];if(!allowed.includes(file.type))throw new Error('Use a PDF, PNG or JPEG file');const path=API.userId()+'/'+result[0].id+'/'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');await API.uploadPrivate('verification-evidence',path,file);await API.rest('verification_evidence',{method:'POST',body:{request_id:result[0].id,path}})}await syncLive()}else{store.verification='Pending Review';store.org.verification_note=d.note;persist()}toast('Verification request submitted for review');render();return}
- if(form.id==='listing-form'){if(currentRole()!=='employer')throw new Error('Employer account required');if(API.enabled){const org=state.liveOrgs.find(x=>x.owner_id===API.userId());if(org?.verification_status!=='approved')throw new Error('Not verified');await API.rest('opportunities',{method:'POST',body:{organization_id:org.id,title:d.title,kind:'Internship',field:d.field,location_state:d.location,work_mode:d.mode,duration:d.duration,description:d.description,education_level:'Undergraduate',status:'published'}});await syncLive()}else{store.opportunityAdds.push({id:'demo-'+Date.now(),type:'Internship',title:d.title,org:store.org.name,brand:initials(store.org.name),color:'#edeaff',ink:'#6246ea',industry:store.org.industry,location:d.location,mode:d.mode,field:d.field,level:'Undergraduate',category:store.org.category||'SME',status:'Demo',details:d.description,skills:[],duration:d.duration,verified:false});persist()}state.modal='';toast(API.enabled?'Internship published':'Demo internship added — not a real vacancy');render();return}
- if(form.id==='apply-form'){if(!API.enabled)throw new Error('Live application unavailable in demo mode');const o=allOp().find(x=>x.id===d.opportunity_id);if(o?.status==='Demo')throw new Error('This is only a sample vacancy');const file=form.querySelector('[name=cv]').files[0];if(!file||file.type!=='application/pdf'||file.size>5*1024*1024)throw new Error('CV must be a PDF under 5MB');const existing=state.liveApplications.find(a=>a.opportunity_id===d.opportunity_id&&a.status!=='Withdrawn');if(existing)throw new Error('You have already applied');const path=API.userId()+'/'+crypto.randomUUID()+'.pdf';await API.uploadPrivate('resumes',path,file);await API.rest('applications',{method:'POST',body:{opportunity_id:d.opportunity_id,user_id:API.userId(),cover_note:d.cover_note,cv_path:path,status:'Submitted'}});await syncLive();state.modal='';toast('Application submitted securely');route('/dashboard');return}
- if(form.id==='report-form'){if(!API.enabled)throw new Error('Reporting requires the live backend');await API.rest('reports',{method:'POST',body:{opportunity_id:d.opportunity_id,user_id:API.userId(),reason:d.reason}});state.modal='';toast('Report submitted');render();return}
- }catch(err){toast(err.message||'Something went wrong');console.error(err)}}
+  function modalContent() {
+    if (state.modal === "post")
+      return popup(
+        "Share your milestone",
+        "Let other students know what you learned or achieved.",
+        `<form id="post-form"><div class="field"><label>Post title</label><input name="title" maxlength="90" required placeholder="I finished my first hackathon!" /></div><div class="field"><label>Tell your story</label><textarea name="content" maxlength="1000" required placeholder="What did you learn? How can others get involved?"></textarea></div><button class="btn btn-primary" type="submit">Publish sample post ${ic("send", 15)}</button></form>`,
+      );
+    if (state.modal.startsWith("apply:")) {
+      const o = allOp().find((x) => x.id === state.modal.split(":")[1]);
+      return popup(
+        "Apply to " + h(o?.title || "internship"),
+        o?.status === "Demo"
+          ? "This is a sample listing. You can save it but cannot send an application to a fictional employer."
+          : "Submit your application. Your résumé will be stored privately for the employer to review.",
+        o?.status === "Demo"
+          ? `<div class="alert">Fictional demo vacancies are not accepting real applications. This protects you from submitting personal documents to a non-existent company.</div><div class="inline-row mt-18"><button class="btn btn-primary" data-save="${attr(o.id)}">Save this sample instead</button></div>`
+          : `<form id="apply-form"><input type="hidden" name="opportunity_id" value="${attr(o.id)}"><div class="field"><label>Short cover note</label><textarea name="cover_note" placeholder="Why are you a good fit?" required></textarea></div><div class="field"><label>Upload CV (PDF; max 5MB)</label><input name="cv" type="file" accept="application/pdf" required /></div><button class="btn btn-primary" type="submit">Submit application</button></form>`,
+      );
+    }
+    if (state.modal.startsWith("report:"))
+      return popup(
+        "Report suspicious listing",
+        "Reports are reviewed by authorized administrators.",
+        `<form id="report-form"><input type="hidden" name="opportunity_id" value="${attr(state.modal.split(":")[1])}"><div class="field"><label>Reason</label><textarea name="reason" required placeholder="Explain what looks suspicious..."></textarea></div><button class="btn btn-primary">Submit report</button></form>`,
+      );
+    return "";
+  }
+  function popup(title, sub, content) {
+    return `<div class="auth-modal-bg" id="modal-overlay" role="presentation"><div class="modal ${state.modal === "new-listing" ? "wide-modal" : ""}" role="dialog" aria-modal="true" aria-labelledby="popup-title"><button class="modal-x" data-act="close" aria-label="Close">${ic("close", 17)}</button><h2 id="popup-title">${title}</h2><p>${sub}</p>${content}</div></div>`;
+  }
+  async function syncLive() {
+    if (!API.enabled) return;
+    try {
+      const [organizations, opportunities] = await Promise.all([
+        API.rest("organizations", {
+          select:
+            "id,owner_id,name,industry,category,location_state,website,registration_number,verification_status",
+        }),
+        API.rest("opportunities", {
+          select: "*",
+          filters: "status=eq.published",
+          order: "created_at.desc",
+        }),
+      ]);
+      state.liveOrgs = organizations || [];
+      state.liveOpps = opportunities || [];
+      if (API.session && API.userId()) {
+        const [profile, applications, saved, requests] = await Promise.all([
+          API.rest("profiles", { filters: "id=eq." + API.userId() }),
+          API.rest("applications", { select: "*" }),
+          API.rest("saved_opportunities", { select: "opportunity_id" }),
+          API.rest("organization_verification_requests", {
+            select: "*",
+            order: "created_at.desc",
+          }),
+        ]);
+        state.liveProfile = profile?.[0] || null;
+        state.liveApplications = applications || [];
+        state.liveSaved = saved || [];
+        state.liveVerification = requests || [];
+      } else {
+        state.liveProfile = null;
+        state.liveApplications = [];
+        state.liveSaved = [];
+        state.liveVerification = [];
+      }
+    } catch (err) {
+      console.warn("Live database sync failed", err);
+      toast("Live data unavailable: " + err.message);
+    }
+  }
+  window.scholarkuRender = render;
+  function render() {
+    state.route = parseRoute();
+    if (
+      state.route === "/assessments" ||
+      state.route.startsWith("/assessment/")
+    ) {
+      location.replace("#/explore");
+      return;
+    }
+    const p = state.route;
+    let main;
+    if (p === "/") main = home();
+    else if (p === "/explore")
+      main = window.ScholarkuOpportunities.render("all");
+    else if (p === "/internships")
+      main = window.ScholarkuOpportunities.render("internships");
+    else if (p === "/graduates")
+      main = window.ScholarkuOpportunities.render("graduates");
+    else if (p === "/scholarships")
+      main = window.ScholarkuOpportunities.render("scholarships");
+    else if (p.startsWith("/funding/"))
+      main = window.ScholarkuOpportunities.detail("funding", p.split("/")[2]);
+    else if (p.startsWith("/careers/"))
+      main = window.ScholarkuOpportunities.detail(
+        p.split("/")[2],
+        p.split("/")[3],
+      );
+    else if (p.startsWith("/opportunity/")) main = detailPage(p.slice(13));
+    else if (p === "/community") main = communityPage();
+    else if (p.startsWith("/community/")) main = serverPage(p.split("/")[2]);
+    else if (p === "/login" || p === "/signup")
+      main = window.ScholarkuAuth.render();
+    else if (p.startsWith("/mentors")) main = mentorPage();
+    else if (p === "/dashboard" || p === "/profile") main = dashboardPage();
+    else if (p === "/employers" || p === "/admin") {
+      location.replace("#/explore");
+      return;
+    } else if (p === "/trust") main = trustPage();
+    else main = home();
+    $("#app").innerHTML =
+      header() +
+      `<main id="main-content">${main}</main>` +
+      footer() +
+      (state.modal ? modalContent() : "");
+    document.dispatchEvent(new Event("scholarku:render"));
+    if (p.startsWith("/community/")) {
+      const box = $("#chat-messages");
+      if (box) box.scrollTop = box.scrollHeight;
+    }
+  }
+  function openAuth(mode = "login", role = "student") {
+    state.modal = "";
+    state.authMode = mode;
+    state.role = role;
+    route(mode === "signup" ? "/signup" : "/login");
+  }
+  async function saveOpportunity(id) {
+    if (!isLoggedIn()) {
+      openAuth();
+      return;
+    }
+    try {
+      if (API.enabled && !id.startsWith("o") && !id.startsWith("demo-")) {
+        if (isSaved(id)) {
+          await API.rest("saved_opportunities", {
+            method: "DELETE",
+            filters: "opportunity_id=eq." + id,
+          });
+          toast("Removed from shortlist");
+        } else {
+          await API.rest("saved_opportunities", {
+            method: "POST",
+            body: { opportunity_id: id, user_id: API.userId() },
+          });
+          toast("Saved to your shortlist");
+        }
+        await syncLive();
+      } else {
+        store.saved = store.saved.includes(id)
+          ? store.saved.filter((x) => x !== id)
+          : [...store.saved, id];
+        persist();
+        toast(
+          store.saved.includes(id)
+            ? "Saved to your shortlist"
+            : "Removed from shortlist",
+        );
+      }
+      state.modal = "";
+      render();
+    } catch (err) {
+      toast(err.message);
+    }
+  }
+  async function review(reqId, decision) {
+    const reason = window.prompt(
+      `Reason for ${decision} decision (recorded in the audit trail):`,
+      decision === "approve"
+        ? "Evidence reviewed and accepted"
+        : "Evidence incomplete or inconsistent",
+    );
+    if (reason === null || !reason.trim()) return;
+    try {
+      if (API.enabled) {
+        await API.rpc("review_verification", {
+          p_request_id: reqId,
+          p_decision: decision === "approve" ? "approved" : "rejected",
+          p_reason: reason,
+        });
+        await syncLive();
+      } else {
+        store.verification = decision === "approve" ? "Approved" : "Rejected";
+        persist();
+      }
+      toast(
+        (decision === "approve" ? "Approved" : "Rejected") +
+          (API.enabled ? " and logged" : " — demo decision only"),
+      );
+      render();
+    } catch (err) {
+      toast(err.message);
+    }
+  }
+  async function withdraw(id) {
+    if (!confirm("Withdraw this application?")) return;
+    try {
+      if (API.enabled) {
+        await API.rest("applications", {
+          method: "PATCH",
+          filters: "id=eq." + id,
+          body: { status: "Withdrawn" },
+        });
+        await syncLive();
+      } else {
+        const a = store.applications.find((x) => x.id === id);
+        if (a) a.status = "Withdrawn";
+        persist();
+      }
+      toast("Application withdrawn");
+      render();
+    } catch (err) {
+      toast(err.message);
+    }
+  }
+  function act(name) {
+    if (name === "mobile") {
+      state.mobile = !state.mobile;
+      render();
+      return;
+    }
+    if (name === "close") {
+      state.modal = "";
+      render();
+      return;
+    }
+    if (name === "login" || name === "signup") {
+      openAuth(name);
+      return;
+    }
+    if (
+      [
+        "dashboard",
+        "explore",
+        "internships",
+        "graduates",
+        "community",
+      ].includes(name)
+    ) {
+      route("/" + (name === "dashboard" ? "dashboard" : name));
+      return;
+    }
+    if (name === "reset-filters") {
+      Object.assign(state, {
+        search: "",
+        type: "All",
+        field: "All Fields",
+        location: "All Locations",
+        mode: "Any Mode",
+        industry: "All Industries",
+        companyType: "All Types",
+        contract: "Any Contract",
+        level: "All Levels",
+      });
+      render();
+      return;
+    }
+    if (name === "logout") {
+      if (API.enabled) {
+        API.signOut().then(() => {
+          syncLive().then(() => {
+            toast("Signed out");
+            route("/");
+          });
+        });
+      } else {
+        store.roles = "guest";
+        persist();
+        toast("Demo session ended");
+        route("/");
+      }
+      return;
+    }
+    if (name === "post") {
+      if (!isLoggedIn()) return openAuth();
+      state.modal = "post";
+      render();
+      return;
+    }
+    if (name === "voice-notice") {
+      toast(
+        "Voice calls need a real-time voice provider. Text chat is available in this demo.",
+      );
+      return;
+    }
+    if (name.startsWith("apply:")) {
+      if (!isLoggedIn()) return openAuth();
+      if (currentRole() !== "student") return toast("Only students can apply");
+      state.modal = name;
+      render();
+      return;
+    }
+    if (name.startsWith("report:")) {
+      state.modal = name;
+      render();
+      return;
+    }
+  }
+  function asForm(f) {
+    return Object.fromEntries(new FormData(f).entries());
+  }
+  async function formSubmit(e) {
+    const form = e.target;
+    if (!form.id) return;
+    e.preventDefault();
+    const d = asForm(form);
+    try {
+      if (form.id === "hero-search") {
+        state.search = (d.query || "").trim();
+        state.type = "All";
+        route("/explore");
+        return;
+      }
+      if (form.id === "profile-form") {
+        const skills = d.skills
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        store.profile = {
+          name: d.name,
+          institution: d.institution,
+          field: d.field,
+          state: d.state,
+          skills: d.skills,
+        };
+        persist();
+        if (API.enabled) {
+          await API.rest("profiles", {
+            method: "PATCH",
+            filters: "id=eq." + API.userId(),
+            body: {
+              full_name: d.name,
+              institution: d.institution,
+              field: d.field,
+              location_state: d.state,
+              skills,
+            },
+          });
+          await syncLive();
+        }
+        toast("Student profile updated");
+        render();
+        return;
+      }
+      if (form.id === "post-form") {
+        store.posts.push({
+          id: "p" + Date.now(),
+          name: state.liveProfile?.full_name || store.profile.name || "Student",
+          initial: initials(store.profile.name),
+          title: d.title,
+          content: d.content,
+          type: "Achievement",
+        });
+        persist();
+        state.modal = "";
+        toast("Achievement shared in demo community");
+        route("/community");
+        return;
+      }
 
-document.addEventListener('submit',formSubmit);
-document.addEventListener('click',async e=>{const target=e.target.closest('[data-act],[data-nav],[data-type],[data-save],[data-search],[data-dash],[data-channel],[data-book],[data-review],[data-withdraw],[data-demo-role],[data-role],[data-auth-mode],[data-cv],[data-evidence]');if(!target){if(e.target.id==='modal-overlay'){state.modal='';render()}return}if(target.tagName==='A'&&target.hasAttribute('data-auth-mode'))e.preventDefault();if(target.dataset.cv||target.dataset.evidence){try{const cv=Boolean(target.dataset.cv);let path=target.dataset.cv;if(!cv){const docs=await API.rest('verification_evidence',{filters:'request_id=eq.'+target.dataset.evidence});path=docs?.[0]?.path;if(!path)throw new Error('No supporting document uploaded')}const signed=await API.signedUrl(cv?'resumes':'verification-evidence',path);const link=signed.signedURL||signed.signedUrl;if(!link)throw new Error('No document URL received');const url=link.startsWith('https://')?link:window.SCHOLARKU_CONFIG.SUPABASE_URL.replace(/\/$/,'')+'/storage/v1'+link;window.open(url,'_blank','noopener,noreferrer')}catch(err){toast(err.message)}return}if(target.dataset.act){act(target.dataset.act);return}if(target.dataset.nav){route(target.dataset.nav);return}if(target.dataset.type){state.type=target.dataset.type;render();return}if(target.dataset.save){await saveOpportunity(target.dataset.save);return}if(target.dataset.search){state.search=target.dataset.search;state.type='All';route('/explore');return}if(target.dataset.dash){state.dashTab=target.dataset.dash;render();return}if(target.dataset.channel){state.channel=target.dataset.channel;render();return}if(target.dataset.book){if(!isLoggedIn())return openAuth();state.modal='book:'+target.dataset.book;render();return}if(target.dataset.review){const [decision,id]=target.dataset.review.split(':');await review(id,decision);return}if(target.dataset.withdraw){await withdraw(target.dataset.withdraw);return}if(target.dataset.demoRole){store.roles=target.dataset.demoRole;persist();state.modal='';state.dashTab='overview';toast('Switched to '+store.roles+' demonstration role');route(store.roles==='employer'?'/employers':store.roles==='admin'?'/admin':'/dashboard');return}if(target.dataset.role){state.role=target.dataset.role;render();return}if(target.dataset.authMode){state.authMode=target.dataset.authMode;render();return}});
-document.addEventListener('change',async e=>{const fieldMap={'filter-field':'field','filter-location':'location','filter-mode':'mode','filter-company':'companyType','filter-contract':'contract','filter-level':'level'};if(fieldMap[e.target.id]){state[fieldMap[e.target.id]]=e.target.value;render();return}if(e.target.matches('[data-status]')){const id=e.target.dataset.status, val=e.target.value;try{if(API.enabled){await API.rest('applications',{method:'PATCH',filters:'id=eq.'+id,body:{status:val}});await syncLive()}else{const a=store.applications.find(x=>x.id===id);if(a)a.status=val;persist()}toast('Application status updated');render()}catch(err){toast(err.message)}}});
-let searchDebounce;document.addEventListener('input',e=>{if(e.target.id!=='filter-search')return;clearTimeout(searchDebounce);const input=e.target;searchDebounce=setTimeout(()=>{state.search=input.value;const pos=input.selectionStart;render();const field=$('#filter-search');field?.focus();field?.setSelectionRange(pos,pos)},350)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.modal){state.modal='';render()}});
-window.addEventListener('hashchange',()=>{state.mobile=false;window.scrollTo(0,0);render()});
+      if (form.id === "apply-form") {
+        if (!API.enabled)
+          throw new Error("Live application unavailable in demo mode");
+        const o = allOp().find((x) => x.id === d.opportunity_id);
+        if (o?.status === "Demo")
+          throw new Error("This is only a sample vacancy");
+        const file = form.querySelector("[name=cv]").files[0];
+        if (
+          !file ||
+          file.type !== "application/pdf" ||
+          file.size > 5 * 1024 * 1024
+        )
+          throw new Error("CV must be a PDF under 5MB");
+        const existing = state.liveApplications.find(
+          (a) =>
+            a.opportunity_id === d.opportunity_id && a.status !== "Withdrawn",
+        );
+        if (existing) throw new Error("You have already applied");
+        const path = API.userId() + "/" + crypto.randomUUID() + ".pdf";
+        await API.uploadPrivate("resumes", path, file);
+        await API.rest("applications", {
+          method: "POST",
+          body: {
+            opportunity_id: d.opportunity_id,
+            user_id: API.userId(),
+            cover_note: d.cover_note,
+            cv_path: path,
+            status: "Submitted",
+          },
+        });
+        await syncLive();
+        state.modal = "";
+        toast("Application submitted securely");
+        route("/dashboard");
+        return;
+      }
+      if (form.id === "report-form") {
+        if (!API.enabled)
+          throw new Error("Reporting requires the live backend");
+        await API.rest("reports", {
+          method: "POST",
+          body: {
+            opportunity_id: d.opportunity_id,
+            user_id: API.userId(),
+            reason: d.reason,
+          },
+        });
+        state.modal = "";
+        toast("Report submitted");
+        render();
+        return;
+      }
+    } catch (err) {
+      toast(err.message || "Something went wrong");
+      console.error(err);
+    }
+  }
 
-document.addEventListener('scholarku:authenticated',async()=>{await syncLive();state.modal='';route('/dashboard')});
-if(!location.hash)location.hash='#/';
-render();if(API.enabled)syncLive().then(()=>{if(!['/login','/signup'].includes(state.route))render()});
+  document.addEventListener("submit", formSubmit);
+  document.addEventListener("click", async (e) => {
+    const target = e.target.closest(
+      "[data-act],[data-nav],[data-type],[data-save],[data-search],[data-dash],[data-channel],[data-book],[data-review],[data-withdraw],[data-demo-role],[data-role],[data-auth-mode],[data-cv],[data-evidence]",
+    );
+    if (!target) {
+      if (e.target.id === "modal-overlay") {
+        state.modal = "";
+        render();
+      }
+      return;
+    }
+    if (target.tagName === "A" && target.hasAttribute("data-auth-mode"))
+      e.preventDefault();
+    if (target.dataset.cv || target.dataset.evidence) {
+      try {
+        const cv = Boolean(target.dataset.cv);
+        let path = target.dataset.cv;
+        if (!cv) {
+          const docs = await API.rest("verification_evidence", {
+            filters: "request_id=eq." + target.dataset.evidence,
+          });
+          path = docs?.[0]?.path;
+          if (!path) throw new Error("No supporting document uploaded");
+        }
+        const signed = await API.signedUrl(
+          cv ? "resumes" : "verification-evidence",
+          path,
+        );
+        const link = signed.signedURL || signed.signedUrl;
+        if (!link) throw new Error("No document URL received");
+        const url = link.startsWith("https://")
+          ? link
+          : window.SCHOLARKU_CONFIG.SUPABASE_URL.replace(/\/$/, "") +
+            "/storage/v1" +
+            link;
+        window.open(url, "_blank", "noopener,noreferrer");
+      } catch (err) {
+        toast(err.message);
+      }
+      return;
+    }
+    if (target.dataset.act) {
+      act(target.dataset.act);
+      return;
+    }
+    if (target.dataset.nav) {
+      route(target.dataset.nav);
+      return;
+    }
+    if (target.dataset.type) {
+      state.type = target.dataset.type;
+      render();
+      return;
+    }
+    if (target.dataset.save) {
+      await saveOpportunity(target.dataset.save);
+      return;
+    }
+    if (target.dataset.search) {
+      state.search = target.dataset.search;
+      state.type = "All";
+      route("/explore");
+      return;
+    }
+    if (target.dataset.dash) {
+      state.dashTab = target.dataset.dash;
+      render();
+      return;
+    }
+    if (target.dataset.review) {
+      const [decision, id] = target.dataset.review.split(":");
+      await review(id, decision);
+      return;
+    }
+    if (target.dataset.withdraw) {
+      await withdraw(target.dataset.withdraw);
+      return;
+    }
+    if (target.dataset.demoRole) {
+      store.roles = target.dataset.demoRole;
+      persist();
+      state.modal = "";
+      state.dashTab = "overview";
+      toast("Switched to " + store.roles + " demonstration role");
+      route(
+        store.roles === "employer"
+          ? "/employers"
+          : store.roles === "admin"
+            ? "/admin"
+            : "/dashboard",
+      );
+      return;
+    }
+    if (target.dataset.role) {
+      state.role = target.dataset.role;
+      render();
+      return;
+    }
+    if (target.dataset.authMode) {
+      state.authMode = target.dataset.authMode;
+      render();
+      return;
+    }
+  });
+  document.addEventListener("change", async (e) => {
+    const fieldMap = {
+      "filter-field": "field",
+      "filter-location": "location",
+      "filter-mode": "mode",
+      "filter-company": "companyType",
+      "filter-contract": "contract",
+      "filter-level": "level",
+    };
+    if (fieldMap[e.target.id]) {
+      state[fieldMap[e.target.id]] = e.target.value;
+      render();
+      return;
+    }
+    if (e.target.matches("[data-status]")) {
+      const id = e.target.dataset.status,
+        val = e.target.value;
+      try {
+        if (API.enabled) {
+          await API.rest("applications", {
+            method: "PATCH",
+            filters: "id=eq." + id,
+            body: { status: val },
+          });
+          await syncLive();
+        } else {
+          const a = store.applications.find((x) => x.id === id);
+          if (a) a.status = val;
+          persist();
+        }
+        toast("Application status updated");
+        render();
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+  });
+  let searchDebounce;
+  document.addEventListener("input", (e) => {
+    if (e.target.id !== "filter-search") return;
+    clearTimeout(searchDebounce);
+    const input = e.target;
+    searchDebounce = setTimeout(() => {
+      state.search = input.value;
+      const pos = input.selectionStart;
+      render();
+      const field = $("#filter-search");
+      field?.focus();
+      field?.setSelectionRange(pos, pos);
+    }, 350);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && state.modal) {
+      state.modal = "";
+      render();
+    }
+  });
+  window.addEventListener("hashchange", () => {
+    state.mobile = false;
+    window.scrollTo(0, 0);
+    render();
+  });
+
+  document.addEventListener("scholarku:authenticated", async () => {
+    await syncLive();
+    state.modal = "";
+    route("/dashboard");
+  });
+  if (!location.hash) location.hash = "#/";
+  render();
+  if (API.enabled)
+    syncLive().then(() => {
+      if (["/dashboard", "/profile"].includes(state.route)) render();
+    });
 })();

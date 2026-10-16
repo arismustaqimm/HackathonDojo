@@ -35,9 +35,9 @@ async function backend(context,requests,options={}){
  try{
   const c=await browser.newContext({viewport:{width:1440,height:1000}});c.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));const p=await c.newPage();await p.goto(base);
   assert.equal(await p.locator('.desktop-nav').count(),0);assert.equal(await p.locator('.compact-header .header-actions>a').count(),1);assert.equal(await p.locator('#explore-menu').isVisible(),false);
-  await p.click('#explore-toggle');assert.equal(await p.locator('#explore-menu a').count(),7);await p.keyboard.press('Escape');assert.equal(await p.locator('#explore-menu').isVisible(),false);
+  await p.click('#explore-toggle');assert.equal(await p.locator('#explore-menu a').count(),6);await p.keyboard.press('Escape');assert.equal(await p.locator('#explore-menu').isVisible(),false);
   await p.focus('#explore-toggle');await p.keyboard.press('ArrowDown');assert(await p.locator('#explore-menu a').first().evaluate(el=>el===document.activeElement));await p.click('#explore-menu a[href="#/internships"]');
-  const names=[];for(let i=1;i<=4;i++){await p.click(`[data-sk-page="${i}"]`);assert.equal(await p.locator('.sk-card').count(),10);names.push(...await p.locator('.sk-org h3').allTextContents())}assert.equal(new Set(names).size,40);
+  const names=[];for(let i=1;i<=4;i++){await p.click(`[data-op-page="${i}"]`);assert.equal(await p.locator('.sk-card').count(),10);names.push(...await p.locator('.sk-org h3').allTextContents())}assert.equal(new Set(names).size,40);
   await p.fill('#sk-query','Maybank');assert.equal(await p.locator('.sk-card').count(),1);await p.click('.sk-save');await p.reload();await p.fill('#sk-query','Maybank');assert.equal(await p.locator('.sk-save').getAttribute('aria-pressed'),'true');
   await locale(p,'bm');assert.match(await p.locator('h1').innerText(),/Latihan industri/);await p.click('#explore-toggle');assert.match(await p.locator('#explore-menu').innerText(),/Program graduan/);await p.click('#explore-menu a[href="#/graduates"]');assert.equal(await p.locator('.sk-card').count(),10);
   await p.click('#sk-theme-toggle');await p.reload();assert.equal(await p.locator('html').getAttribute('data-theme'),'light');assert.equal(await p.locator('html').getAttribute('lang'),'ms');await locale(p,'en');

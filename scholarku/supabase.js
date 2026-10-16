@@ -10,14 +10,18 @@
   async function request(path, options = {}, auth = true) {
     if (!enabled) throw new Error('Live backend is not configured');
     const headers = { apikey: key, Authorization: 'Bearer ' + (auth ? getAccess() : key), ...options.headers };
-    if (options.body && !(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+    if (typeof options.body === 'string' && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
     let res = await fetch(root + path, { ...options, headers });
     if (res.status === 401 && session?.refresh_token && auth) {
       try { await refresh(); headers.Authorization = 'Bearer ' + getAccess(); res = await fetch(root + path, { ...options, headers }); } catch {}
     }
     const txt = await res.text();
     let data; try { data = txt ? JSON.parse(txt) : null; } catch { data = txt; }
-    if (!res.ok) throw new Error(data?.msg || data?.error_description || data?.message || `Request failed (${res.status})`);
+    if (!res.ok) {
+      const error=new Error(data?.msg || data?.error_description || data?.message || `Request failed (${res.status})`);
+      error.status=res.status;
+      throw error;
+    }
     return data;
   }
   function saveSession(data) {
@@ -33,8 +37,8 @@
   async function signIn(email, password) {
     return saveSession(await request('/auth/v1/token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) }, false));
   }
-  async function signUp(email, password, name, role = 'student') {
-    return await request('/auth/v1/signup', { method: 'POST', body: JSON.stringify({ email, password, data: { full_name: name, desired_role: role === 'employer' ? 'employer' : 'student' } }) }, false);
+  async function signUp(email, password, name) {
+    return await request('/auth/v1/signup', { method: 'POST', body: JSON.stringify({ email, password, data: { full_name: name, desired_role: 'student' } }) }, false);
   }
   // Google OAuth uses PKCE. No Google secret or password belongs in this frontend.
   function reloadSession() {
@@ -101,10 +105,11 @@
     try { if (session) await request('/auth/v1/logout', { method: 'POST' }); } catch {}
     saveSession(null);
   }
-  async function rest(table, { method = 'GET', select = '*', filters = '', body, single = false, order = '', onConflict = '' } = {}) {
+  async function rest(table, { method = 'GET', select = '*', filters = '', body, single = false, order = '', onConflict = '', limit = null } = {}) {
     const q = new URLSearchParams();
     if (method === 'GET') q.set('select', select);
     if (order) q.set('order', order);
+    if (limit !== null) q.set('limit', String(limit));
     if (onConflict) q.set('on_conflict', onConflict);
     const suffix = [q.toString(), filters.replace(/^&/, '')].filter(Boolean).join('&');
     const headers = {};
@@ -118,8 +123,12 @@
     return request(`/storage/v1/object/${bucket}/${safe}`, { method: 'POST', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'false' } });
   }
   async function signedUrl(bucket, path) {
-    return request(`/storage/v1/object/sign/${bucket}/${path}`, { method: 'POST', body: JSON.stringify({ expiresIn: 60 }) });
+    const safe=encodeURIComponent(path).replace(/%2F/g,'/');
+    return request(`/storage/v1/object/sign/${encodeURIComponent(bucket)}/${safe}`, { method: 'POST', body: JSON.stringify({ expiresIn: 60 }) });
+  }
+  async function removePrivate(bucket, path) {
+    return request('/storage/v1/object/' + encodeURIComponent(bucket), { method:'DELETE',body:JSON.stringify({prefixes:[path]}) });
   }
   function userId() { if (!session?.access_token) return null; try { return JSON.parse(atob(session.access_token.split('.')[1])).sub || null; } catch { return null; } }
-  window.API = { enabled, rest, rpc, signIn, signUp, signInWithGoogle, completeGoogleSignIn, signOut, uploadPrivate, signedUrl, userId, get session() { return session; } };
+  window.API = { enabled, rest, rpc, signIn, signUp, signInWithGoogle, completeGoogleSignIn, signOut, uploadPrivate, signedUrl, removePrivate, userId, get session() { return session; } };
 })();

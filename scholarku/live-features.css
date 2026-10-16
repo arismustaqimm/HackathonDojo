@@ -1,0 +1,511 @@
+/* Use semantic theme tokens on every opportunity/filter state, including native options. */
+[data-theme="dark"]
+  :is(
+    .op-card,
+    .feature-card,
+    .filter-bar,
+    .opportunity-facts,
+    .live-mentor-card,
+    .live-community-card
+  ) {
+  background: #192a40;
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme="dark"]
+  :is(
+    .filter-bar input,
+    .filter-bar select,
+    .filter-bar option,
+    .field input,
+    .field select,
+    .field textarea,
+    .chat-compose input,
+    .sk-controls select,
+    .sk-controls option
+  ) {
+  background: #1c2a40;
+  color: var(--ink);
+  border-color: #40516c;
+  color-scheme: dark;
+}
+[data-theme="dark"] .tab,
+[data-theme="dark"] .tab:hover,
+[data-theme="dark"] .tab.active {
+  background: #22324b;
+  color: #e5eaff;
+  border-color: #465779;
+}
+[data-theme="dark"] .tab.active,
+[data-theme="dark"] .tab:hover {
+  background: #403465;
+  border-color: #9c8ad9;
+}
+[data-theme="dark"] :is(.op-footer, .detail-actions, .divider-line) {
+  border-color: var(--line);
+}
+[data-theme="dark"]
+  :is(.explore-option, .explore-option:hover, .explore-option[aria-current]) {
+  color: var(--ink);
+}
+[data-theme="dark"] .explore-option {
+  background: var(--bg);
+}
+[data-theme="dark"] :is(.explore-option:hover, .explore-option[aria-current]) {
+  background: var(--slate);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.opportunity-prose {
+  line-height: 1.8;
+}
+.opportunity-prose li {
+  color: var(--muted);
+}
+.external-arrow {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.opportunity-prose ol,
+.opportunity-prose ul {
+  padding-left: 23px;
+}
+.opportunity-prose li + li {
+  margin-top: 10px;
+}
+.opportunity-prose .btn {
+  margin-top: 8px;
+}
+.opportunity-facts {
+  height: max-content;
+  position: sticky;
+  top: 96px;
+}
+.opportunity-facts dl {
+  margin: 0;
+}
+.opportunity-facts dl > div {
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+}
+.opportunity-facts dt {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.opportunity-facts dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.official-short-link {
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--muted);
+  margin-left: auto;
+}
+.card-funding-benefit {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.sk-note {
+  min-height: 0;
+}
+.sk-card-actions {
+  flex-wrap: wrap;
+}
+.sk-card {
+  display: flex;
+  flex-direction: column;
+}
+.sk-card > .sk-card-actions {
+  margin-top: auto;
+}
+.sk-card .sk-dates dd {
+  overflow-wrap: anywhere;
+}
+.sk-results {
+  min-height: 20px;
+}
+.live-dialog {
+  width: min(600px, calc(100vw - 28px));
+  max-height: 90dvh;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 30px 100px #0005;
+  overflow: auto;
+}
+.live-dialog::backdrop {
+  background: #050d1bcc;
+  backdrop-filter: blur(3px);
+}
+.live-dialog h2 {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+  margin: 0 0 15px;
+}
+.live-dialog p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.live-dialog .field {
+  margin: 18px 0;
+}
+.live-dialog .field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.live-dialog .field :is(input, textarea, select) {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--slate);
+  color: var(--ink);
+  border-radius: 9px;
+  padding: 12px;
+}
+.live-dialog textarea {
+  min-height: 115px;
+  resize: vertical;
+}
+.live-dialog small {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.live-message,
+.chat-error {
+  padding: 12px 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.live-message.error,
+.chat-error {
+  color: #b52438;
+  background: #fff0f2;
+}
+.live-message.success {
+  color: #156c50;
+  background: #e7f7ee;
+}
+[data-theme="dark"] :is(.live-message.error, .chat-error) {
+  background: #3a2631;
+  color: #ffc5d0;
+  border-color: #69414e;
+}
+[data-theme="dark"] .live-message.success {
+  background: #163c35;
+  color: #91e6c7;
+}
+.live-community-card {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.live-community-card h2 {
+  font-size: 19px;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+.live-community-card p {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--muted);
+  font-size: 13px;
+}
+.live-community-card .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+.community-emoji {
+  font-size: 28px;
+}
+.community-catalogue {
+  margin-top: 22px;
+}
+.live-chat-layout {
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+.live-chat-layout .chat-pane {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  min-width: 0;
+  background: var(--bg);
+}
+.live-chat-layout .chat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+}
+.live-chat-layout .chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+  scroll-behavior: auto;
+}
+.live-chat-layout .chat-compose {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 10px;
+  background: var(--slate);
+}
+.live-chat-layout .chat-compose input {
+  flex: 1;
+  min-width: 0;
+}
+.live-chat-layout .chat-compose button {
+  flex-shrink: 0;
+}
+.live-chat-layout .chat-error {
+  margin: 0 16px 12px;
+}
+.live-chat-layout .server-channels {
+  background: var(--slate);
+}
+.live-chat-layout .channel {
+  color: var(--muted);
+}
+.live-chat-layout .channel:hover,
+.live-chat-layout .channel.active {
+  background: var(--soft);
+  color: var(--purple);
+}
+.chat-empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 75px 15px;
+}
+.chat-empty h3 {
+  color: var(--ink);
+  font-size: 18px;
+}
+.chat-empty p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.chat-message .message-copy {
+  min-width: 0;
+  flex: 1;
+}
+.chat-message p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--ink) !important;
+}
+.chat-message time {
+  font-size: 10px;
+  color: var(--muted);
+}
+.message-action {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0;
+  font-size: 10px;
+}
+.message-action:hover {
+  color: var(--purple);
+}
+.live-mentor-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.live-mentor-card h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+.live-mentor-card .mentor-avatar {
+  margin: 0;
+  background: var(--soft);
+  color: var(--purple);
+  height: 54px;
+  width: 54px;
+}
+.live-mentor-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.live-mentor-card .mentor-role {
+  font-weight: 700;
+  color: var(--ink) !important;
+}
+.live-mentor-card .badge {
+  align-self: flex-start;
+}
+.mentor-availability {
+  font-size: 10px !important;
+  color: var(--muted);
+}
+.mentor-availability.enrolled {
+  color: #159779 !important;
+}
+.mentor-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.mentor-actions .btn {
+  width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+.mentor-directory .mentor-card:hover {
+  transform: none;
+}
+.request-types {
+  display: flex;
+  gap: 15px;
+  margin: 22px 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.request-types label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+}
+.request-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 18px;
+}
+.request-consent input {
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.mentor-request-row + .mentor-request-row {
+  margin-top: 16px;
+}
+.mentor-reply-form {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.mentor-reply-form label {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.mentor-reply-form textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--slate);
+  color: var(--ink);
+  resize: vertical;
+}
+.mentor-feedback {
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  margin-top: 18px;
+  background: var(--slate);
+}
+.mentor-request-row p[data-no-translate] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .opportunity-facts {
+    position: static;
+  }
+  .live-chat-layout {
+    grid-template-columns: 1fr;
+  }
+  .live-chat-layout .server-channels {
+    display: flex;
+    overflow-x: auto;
+    gap: 7px;
+    padding: 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .live-chat-layout .channel-title {
+    display: none;
+  }
+  .live-chat-layout .channel {
+    width: auto;
+    white-space: nowrap;
+  }
+  .live-chat-layout .chat-pane {
+    height: 560px;
+  }
+  .live-chat-layout .chat-messages {
+    padding: 16px;
+  }
+  .live-dialog {
+    padding: 22px;
+  }
+  .opportunity-prose .btn {
+    white-space: normal;
+  }
+  .sk-controls select {
+    max-width: 100%;
+  }
+}
+@media (max-width: 420px) {
+  .live-chat-layout .chat-compose {
+    padding: 10px;
+    gap: 6px;
+  }
+  .live-chat-layout .chat-compose .btn {
+    padding: 11px;
+  }
+  .sk-card-actions .sk-apply {
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+  .official-short-link {
+    margin-left: 0;
+  }
+}
