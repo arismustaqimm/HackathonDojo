@@ -36,6 +36,64 @@
   async function signUp(email, password, name, role = 'student') {
     return await request('/auth/v1/signup', { method: 'POST', body: JSON.stringify({ email, password, data: { full_name: name, desired_role: role === 'employer' ? 'employer' : 'student' } }) }, false);
   }
+  // Google OAuth uses PKCE. No Google secret or password belongs in this frontend.
+  function reloadSession() {
+    try { session = JSON.parse(localStorage.getItem('scholarku.auth') || 'null'); } catch { session = null; }
+    return session;
+  }
+  const oauthKey = state => 'scholarku.oauth.' + state;
+  const base64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  async function completeGoogleSignIn(url) {
+    if (!enabled || url.origin !== location.origin || url.pathname !== '/auth-callback.html') throw new Error('Invalid sign-in destination');
+    const state = url.searchParams.get('state');
+    const raw = state && localStorage.getItem(oauthKey(state));
+    if (!raw) throw new Error('Sign-in request expired');
+    localStorage.removeItem(oauthKey(state));
+    const pending = JSON.parse(raw);
+    if (Date.now() - pending.created > 5 * 60 * 1000 || !url.searchParams.get('code') || url.searchParams.has('error')) throw new Error('Sign-in was not completed');
+    const data = await request('/auth/v1/token?grant_type=pkce', {
+      method: 'POST', body: JSON.stringify({auth_code: url.searchParams.get('code'), code_verifier: pending.verifier})
+    }, false);
+    if (!data?.access_token || !data?.user?.id) throw new Error('Invalid authentication response');
+    return saveSession(data);
+  }
+  function signInWithGoogle() {
+    if (!enabled) return Promise.reject(new Error('Account sign-in is not configured'));
+    const popup = window.open('/auth-callback.html?pending=1', 'scholarku-google', 'popup,width=520,height=680');
+    if (!popup) return Promise.reject(new Error('Allow the sign-in popup to continue'));
+    return new Promise((resolve, reject) => {
+      const state = crypto.randomUUID();
+      const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+      let ended = false;
+      function cleanup(error) {
+        if (ended) return;
+        ended = true;
+        clearInterval(poll); clearTimeout(timeout);
+        window.removeEventListener('message', receive);
+        localStorage.removeItem(oauthKey(state));
+        if (!popup.closed) popup.close();
+        if (error) reject(error); else resolve(reloadSession());
+      }
+      function receive(event) {
+        if (event.origin !== location.origin || event.source !== popup) return;
+        if (event.data?.type === 'scholarku:google-complete') {
+          if (reloadSession()?.access_token) cleanup(); else cleanup(new Error('No authenticated session received'));
+        } else if (event.data?.type === 'scholarku:google-error') cleanup(new Error('Google sign-in failed'));
+      }
+      window.addEventListener('message', receive);
+      const poll = setInterval(() => { if (popup.closed) cleanup(new Error('Sign-in window closed')); }, 500);
+      const timeout = setTimeout(() => cleanup(new Error('Sign-in request expired')), 5 * 60 * 1000);
+      (async () => {
+        const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+        if (ended) return;
+        localStorage.setItem(oauthKey(state), JSON.stringify({verifier, created: Date.now()}));
+        const redirect = new URL('/auth-callback.html', location.origin); redirect.searchParams.set('state', state);
+        const url = new URL(root + '/auth/v1/authorize');
+        url.search = new URLSearchParams({provider: 'google', redirect_to: redirect.href, code_challenge: base64url(new Uint8Array(digest)), code_challenge_method: 's256', prompt: 'select_account'}).toString();
+        popup.location.href = url.href;
+      })().catch(cleanup);
+    });
+  }
   async function signOut() {
     try { if (session) await request('/auth/v1/logout', { method: 'POST' }); } catch {}
     saveSession(null);
@@ -60,5 +118,5 @@
     return request(`/storage/v1/object/sign/${bucket}/${path}`, { method: 'POST', body: JSON.stringify({ expiresIn: 60 }) });
   }
   function userId() { if (!session?.access_token) return null; try { return JSON.parse(atob(session.access_token.split('.')[1])).sub || null; } catch { return null; } }
-  window.API = { enabled, rest, rpc, signIn, signUp, signOut, uploadPrivate, signedUrl, userId, get session() { return session; } };
+  window.API = { enabled, rest, rpc, signIn, signUp, signInWithGoogle, completeGoogleSignIn, signOut, uploadPrivate, signedUrl, userId, get session() { return session; } };
 })();
