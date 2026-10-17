@@ -8,7 +8,11 @@ Follow [UPDATE_AND_DEPLOY.md](UPDATE_AND_DEPLOY.md). Preserve your working `conf
 
 ## Run in VS Code
 
-Open the `scholarku` folder containing `package.json`. Node.js 18 or newer is required. On Windows PowerShell:
+Node.js 18 or newer is required. Open either the repository folder or its `scholarku` subfolder using **File → Open Folder** in VS Code. Press **F5** and choose **ScholarKu (localhost:5173)** if prompted. The included `.vscode/launch.json` starts the Node server on port 5173 and opens the site in your default browser. No terminal commands or extra extensions are needed. Use **Shift+F5** to stop it. If a terminal already runs the server, stop it with Ctrl+C before using F5 to free port 5173.
+
+For an existing downloaded copy, you can copy only the new `.vscode` folder into the matching folder on your laptop. Keep your working `config.js` and other app files. The repository-root configuration expects the `scholarku` subfolder; the configuration inside `scholarku` expects `server.mjs` beside it.
+
+Alternatively, open a terminal in `scholarku` (the folder containing `package.json`). On Windows PowerShell:
 
 ```powershell
 npm.cmd start

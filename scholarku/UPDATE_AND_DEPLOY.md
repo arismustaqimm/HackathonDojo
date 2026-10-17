@@ -2,6 +2,12 @@
 
 Your Google/email authentication already works on your laptop. Keep using that same Supabase project and preserve your working `config.js`.
 
+## Start with F5 in VS Code
+
+The ZIP includes `.vscode/launch.json` in both the repository root and `scholarku`, so either folder can be opened in VS Code. Press **F5**, select **ScholarKu (localhost:5173)** if prompted, and the server starts on port 5173 with the browser opening automatically. Stop it with **Shift+F5**. Stop any previous terminal server with Ctrl+C before switching to F5.
+
+To add F5 support to a working older download, copy only the repository-root `.vscode` folder into your existing `HackathonDojo-main_4TH` folder, then reopen that folder in VS Code. If you open just `scholarku` in VS Code, copy `scholarku/.vscode` into your existing `scholarku` instead. This requires no edits to `config.js`, application code or Supabase.
+
 ## 1. Update the local files
 
 1. Download the latest repository ZIP and extract it into a new folder.

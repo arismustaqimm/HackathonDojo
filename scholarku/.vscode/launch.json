@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ScholarKu (localhost:5173)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.mjs",
+      "cwd": "${workspaceFolder}",
+      "env": { "PORT": "5173" },
+      "console": "internalConsole",
+      "outputCapture": "std",
+      "serverReadyAction": {
+        "pattern": "Scholarku ready at http://localhost:([0-9]+)",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      }
+    }
+  ]
+}
